@@ -72,11 +72,13 @@ java {
 	}
 }
 
+def projectName = project.name
+
 jar {
-	inputs.property "projectName", project.name
+	inputs.property "projectName", projectName
 
 	from("LICENSE") {
-		rename { "${it}_${project.name}"}
+		rename { "${it}_${projectName}" }
 	}
 }
 
