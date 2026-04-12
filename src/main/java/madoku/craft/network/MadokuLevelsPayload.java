@@ -1,0 +1,44 @@
+package madoku.craft.network;
+
+import madoku.craft.levels.MadokuCraftLevels;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+
+public record MadokuLevelsPayload(
+	String username,
+	int level,
+	int currentXp,
+	int requiredXp,
+	int availablePoints,
+	int maxStatLevel,
+	String statLevels
+) implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<MadokuLevelsPayload> TYPE =
+		new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_levels"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, MadokuLevelsPayload> CODEC =
+		StreamCodec.composite(
+			ByteBufCodecs.STRING_UTF8,
+			MadokuLevelsPayload::username,
+			ByteBufCodecs.VAR_INT,
+			MadokuLevelsPayload::level,
+			ByteBufCodecs.VAR_INT,
+			MadokuLevelsPayload::currentXp,
+			ByteBufCodecs.VAR_INT,
+			MadokuLevelsPayload::requiredXp,
+			ByteBufCodecs.VAR_INT,
+			MadokuLevelsPayload::availablePoints,
+			ByteBufCodecs.VAR_INT,
+			MadokuLevelsPayload::maxStatLevel,
+			ByteBufCodecs.STRING_UTF8,
+			MadokuLevelsPayload::statLevels,
+			MadokuLevelsPayload::new
+		);
+
+	@Override
+	public Type<MadokuLevelsPayload> type() {
+		return TYPE;
+	}
+}

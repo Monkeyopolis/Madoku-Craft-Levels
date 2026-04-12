@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "madoku-craft-levels",
+	"version": "${version}",
+	"name": "Madoku Craft: Levels",
+	"description": "A configurable Leveling system.",
+	"authors": [
+		"Monkeyopolis"
+	],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/madoku-craft-levels"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/madoku-craft-levels/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"madoku.craft.levels.MadokuCraftLevels"
+		],
+		"client": [
+			"madoku.craft.levels.client.MadokuCraftLevelsClient"
+		]
+	},
+	"mixins": [
+		"madoku-craft-levels.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.18.6",
+		"minecraft": "~26.1.2",
+		"java": ">=25",
+		"fabric-api": "*",
+		"madoku-craft-api": ">=${madoku_craft_api_mod_version}"
+	}
+}
