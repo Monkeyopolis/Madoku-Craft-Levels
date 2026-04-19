@@ -66,8 +66,8 @@ public final class MadokuLevels {
 		}
 
 		loadStaticConfig();
-		PayloadTypeRegistry.clientboundPlay().register(MadokuLevelsPayload.TYPE, MadokuLevelsPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(MadokuLevelUpPayload.TYPE, MadokuLevelUpPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(MadokuLevelsPayload.TYPE, MadokuLevelsPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(MadokuLevelUpPayload.TYPE, MadokuLevelUpPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(MadokuLevelUpPayload.TYPE, (payload, context) ->
 			handleLevelUpRequest(context.player(), payload.statId())
 		);

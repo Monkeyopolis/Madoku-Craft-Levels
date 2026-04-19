@@ -203,9 +203,9 @@ public final class MadokuLevelsScreen extends Screen {
 		}
 
 		var graphics = guiGraphics;
-		((net.minecraft.client.gui.GuiGraphicsExtractor) graphics).pose().pushMatrix();
-		((net.minecraft.client.gui.GuiGraphicsExtractor) graphics).pose().scale(scale, scale);
-		((net.minecraft.client.gui.GuiGraphicsExtractor) graphics).text(
+		((net.minecraft.client.gui.GuiGraphics) graphics).pose().pushMatrix();
+		((net.minecraft.client.gui.GuiGraphics) graphics).pose().scale(scale, scale);
+		((net.minecraft.client.gui.GuiGraphics) graphics).drawString(
 			this.font,
 			text,
 			Math.round(x / scale),
@@ -213,7 +213,7 @@ public final class MadokuLevelsScreen extends Screen {
 			color,
 			false
 		);
-		((net.minecraft.client.gui.GuiGraphicsExtractor) graphics).pose().popMatrix();
+		((net.minecraft.client.gui.GuiGraphics) graphics).pose().popMatrix();
 	}
 
 	private void drawScaledCenteredText(Object guiGraphics, String text, int centerX, int y, float scale, int color) {
