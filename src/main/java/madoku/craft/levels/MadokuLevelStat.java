@@ -1,6 +1,6 @@
 package madoku.craft.levels;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
@@ -39,8 +39,8 @@ public enum MadokuLevelStat {
 		return MadokuLevels.maxStatLevel();
 	}
 
-	public Identifier iconTexture() {
-		return Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "textures/icons/" + iconTextureName + ".png");
+	public ResourceLocation iconTexture() {
+		return ResourceLocation.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "textures/icons/" + iconTextureName + ".png");
 	}
 
 	public int accentColor() {

@@ -2,19 +2,18 @@ package madoku.craft.levels;
 
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
 public final class MadokuLevelsScreen extends Screen {
-	private static final Identifier BACKGROUND_TEXTURE =
-		Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "textures/containers/player_levels_vanilla.png");
-	private static final Identifier ENTRY_TEXTURE =
-		Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "textures/rows/player_entries.png");
-	private static final Identifier XP_BAR_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("hud/experience_bar_background");
-	private static final Identifier XP_BAR_PROGRESS_TEXTURE = Identifier.withDefaultNamespace("hud/experience_bar_progress");
+	private static final ResourceLocation BACKGROUND_TEXTURE =
+		ResourceLocation.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "textures/containers/player_levels_vanilla.png");
+	private static final ResourceLocation ENTRY_TEXTURE =
+		ResourceLocation.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "textures/rows/player_entries.png");
+	private static final ResourceLocation XP_BAR_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("hud/experience_bar_background");
+	private static final ResourceLocation XP_BAR_PROGRESS_TEXTURE = ResourceLocation.withDefaultNamespace("hud/experience_bar_progress");
 	private static final int TEXTURE_SIZE = 256;
 	private static final int PANEL_WIDTH = 176;
 	private static final int PANEL_HEIGHT = 165;
@@ -51,14 +50,13 @@ public final class MadokuLevelsScreen extends Screen {
 	@Override
 	protected void init() {
 		this.addRenderableOnly((guiGraphics, mouseX, mouseY, partialTick) -> {
-			guiGraphics.fill(RenderPipelines.GUI, 0, 0, this.width, this.height, 0x88000000);
+			guiGraphics.fill(0, 0, this.width, this.height, 0x88000000);
 
 			int panelX = panelX();
 			int panelY = panelY();
 			MadokuLevelsClientState.Snapshot snapshot = MadokuLevelsClientState.snapshot();
 
 			guiGraphics.blit(
-				RenderPipelines.GUI_TEXTURED,
 				BACKGROUND_TEXTURE,
 				panelX,
 				panelY,
@@ -97,10 +95,10 @@ public final class MadokuLevelsScreen extends Screen {
 			int xpFilledWidth = snapshot.requiredXp() <= 0
 				? 0
 				: Math.max(0, Math.min(XP_BAR_WIDTH, Math.round((snapshot.currentXp() / (float) snapshot.requiredXp()) * XP_BAR_WIDTH)));
-			guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, XP_BAR_BACKGROUND_TEXTURE, xpBarX, xpBarY, XP_BAR_WIDTH, XP_BAR_HEIGHT);
+			guiGraphics.blitSprite(XP_BAR_BACKGROUND_TEXTURE, xpBarX, xpBarY, XP_BAR_WIDTH, XP_BAR_HEIGHT);
 			if (xpFilledWidth > 0) {
 				guiGraphics.enableScissor(xpBarX, xpBarY, xpBarX + xpFilledWidth, xpBarY + XP_BAR_HEIGHT);
-				guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, XP_BAR_PROGRESS_TEXTURE, xpBarX, xpBarY, XP_BAR_WIDTH, XP_BAR_HEIGHT);
+				guiGraphics.blitSprite(XP_BAR_PROGRESS_TEXTURE, xpBarX, xpBarY, XP_BAR_WIDTH, XP_BAR_HEIGHT);
 				guiGraphics.disableScissor();
 			}
 			drawScaledCenteredText(guiGraphics, xpText, this.width / 2, xpTextY, INFO_TEXT_SCALE, SUBTEXT_COLOR);
@@ -124,7 +122,6 @@ public final class MadokuLevelsScreen extends Screen {
 				String statLevelText = statLevel + "/" + snapshot.maxStatLevel();
 
 				guiGraphics.blit(
-					RenderPipelines.GUI_TEXTURED,
 					ENTRY_TEXTURE,
 					entryX,
 					entryY,
@@ -136,7 +133,6 @@ public final class MadokuLevelsScreen extends Screen {
 					ENTRY_HEIGHT
 				);
 				guiGraphics.blit(
-					RenderPipelines.GUI_TEXTURED,
 					stat.iconTexture(),
 					iconX,
 					iconY,
@@ -203,8 +199,8 @@ public final class MadokuLevelsScreen extends Screen {
 		}
 
 		var graphics = guiGraphics;
-		((net.minecraft.client.gui.GuiGraphics) graphics).pose().pushMatrix();
-		((net.minecraft.client.gui.GuiGraphics) graphics).pose().scale(scale, scale);
+		((net.minecraft.client.gui.GuiGraphics) graphics).pose().pushPose();
+		((net.minecraft.client.gui.GuiGraphics) graphics).pose().scale(scale, scale, 1.0F);
 		((net.minecraft.client.gui.GuiGraphics) graphics).drawString(
 			this.font,
 			text,
@@ -213,7 +209,7 @@ public final class MadokuLevelsScreen extends Screen {
 			color,
 			false
 		);
-		((net.minecraft.client.gui.GuiGraphics) graphics).pose().popMatrix();
+		((net.minecraft.client.gui.GuiGraphics) graphics).pose().popPose();
 	}
 
 	private void drawScaledCenteredText(Object guiGraphics, String text, int centerX, int y, float scale, int color) {

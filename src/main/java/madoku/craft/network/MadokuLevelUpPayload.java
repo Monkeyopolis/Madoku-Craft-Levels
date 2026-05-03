@@ -5,11 +5,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public record MadokuLevelUpPayload(String statId) implements CustomPacketPayload {
 	public static final CustomPacketPayload.Type<MadokuLevelUpPayload> TYPE =
-		new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_level_up"));
+		new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_level_up"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, MadokuLevelUpPayload> CODEC =
 		StreamCodec.composite(
 			ByteBufCodecs.STRING_UTF8,

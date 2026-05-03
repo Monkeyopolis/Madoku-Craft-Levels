@@ -10,7 +10,7 @@ import madoku.craft.network.MadokuLevelsPayload;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -42,14 +42,14 @@ public final class MadokuLevels {
 	private static final double DEFAULT_PLAYER_DAMAGE_PER_LEVEL = 0.2d;
 	private static final double DEFAULT_PLAYER_ARMOR_PER_LEVEL = 0.2d;
 	private static final double DEFAULT_PLAYER_MOVEMENT_SPEED_PER_LEVEL = 0.001d;
-	private static final Identifier HEALTH_BONUS_MODIFIER_ID =
-		Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_levels_health_bonus");
-	private static final Identifier DAMAGE_BONUS_MODIFIER_ID =
-		Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_levels_damage_bonus");
-	private static final Identifier ARMOR_BONUS_MODIFIER_ID =
-		Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_levels_armor_bonus");
-	private static final Identifier MOVEMENT_SPEED_BONUS_MODIFIER_ID =
-		Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_levels_movement_speed_bonus");
+	private static final ResourceLocation HEALTH_BONUS_MODIFIER_ID =
+		ResourceLocation.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_levels_health_bonus");
+	private static final ResourceLocation DAMAGE_BONUS_MODIFIER_ID =
+		ResourceLocation.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_levels_damage_bonus");
+	private static final ResourceLocation ARMOR_BONUS_MODIFIER_ID =
+		ResourceLocation.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_levels_armor_bonus");
+	private static final ResourceLocation MOVEMENT_SPEED_BONUS_MODIFIER_ID =
+		ResourceLocation.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "madoku_levels_movement_speed_bonus");
 
 	private static final Map<UUID, PlayerState> PLAYER_STATES = new HashMap<>();
 	private static final Set<UUID> DIRTY_PLAYERS = new HashSet<>();
@@ -299,7 +299,7 @@ public final class MadokuLevels {
 		}
 	}
 
-	private static void applyAttributeModifier(AttributeInstance attribute, Identifier modifierId, double amount) {
+	private static void applyAttributeModifier(AttributeInstance attribute, ResourceLocation modifierId, double amount) {
 		if (attribute == null || modifierId == null) {
 			return;
 		}
