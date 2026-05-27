@@ -3,6 +3,7 @@ package madoku.craft.levels;
 import net.minecraft.resources.Identifier;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +88,54 @@ public enum MadokuLevelStat {
 		return levels;
 	}
 
-	public static List<MadokuLevelStat> visibleStats() {
+	public static List<MadokuLevelStat> vanillaVisibleStats() {
 		return List.of(HEALTH, PLAYER_DAMAGE, PLAYER_ARMOR, PLAYER_MOVEMENT_SPEED);
+	}
+
+	public static List<MadokuLevelStat> attributeVisibleStats() {
+		return vanillaVisibleStats();
+	}
+
+	public static List<MadokuLevelStat> attributeVisibleStatsWithoutHunger() {
+		return vanillaVisibleStats();
+	}
+
+	public static List<MadokuLevelStat> attributeVisibleStatsWithoutLuck() {
+		return vanillaVisibleStats();
+	}
+
+	public static String encodeVisibleStats(Iterable<MadokuLevelStat> stats) {
+		StringBuilder builder = new StringBuilder();
+		if (stats == null) {
+			return "";
+		}
+
+		for (MadokuLevelStat stat : stats) {
+			if (stat == null) {
+				continue;
+			}
+			if (builder.length() > 0) {
+				builder.append(';');
+			}
+			builder.append(stat.id);
+		}
+		return builder.toString();
+	}
+
+	public static List<MadokuLevelStat> decodeVisibleStats(String encodedStats) {
+		List<MadokuLevelStat> decoded = new ArrayList<>();
+		if (encodedStats == null || encodedStats.isBlank()) {
+			return decoded;
+		}
+
+		String[] entries = encodedStats.split(";");
+		for (String entry : entries) {
+			MadokuLevelStat stat = fromId(entry);
+			if (stat != null && !decoded.contains(stat)) {
+				decoded.add(stat);
+			}
+		}
+		return decoded;
 	}
 
 	public static String encodeLevels(Map<MadokuLevelStat, Integer> levels) {

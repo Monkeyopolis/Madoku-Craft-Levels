@@ -14,6 +14,8 @@ public record MadokuLevelsPayload(
 	int requiredXp,
 	int availablePoints,
 	int maxStatLevel,
+	boolean useAttributesContainer,
+	String visibleStats,
 	String statLevels
 ) implements CustomPacketPayload {
 	public static final CustomPacketPayload.Type<MadokuLevelsPayload> TYPE =
@@ -32,6 +34,10 @@ public record MadokuLevelsPayload(
 			MadokuLevelsPayload::availablePoints,
 			ByteBufCodecs.VAR_INT,
 			MadokuLevelsPayload::maxStatLevel,
+			ByteBufCodecs.BOOL,
+			MadokuLevelsPayload::useAttributesContainer,
+			ByteBufCodecs.STRING_UTF8,
+			MadokuLevelsPayload::visibleStats,
 			ByteBufCodecs.STRING_UTF8,
 			MadokuLevelsPayload::statLevels,
 			MadokuLevelsPayload::new

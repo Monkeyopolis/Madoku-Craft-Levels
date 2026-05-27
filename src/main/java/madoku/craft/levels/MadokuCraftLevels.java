@@ -1,6 +1,6 @@
 package madoku.craft.levels;
 
-import madoku.craft.config.StaticJsonSystem;
+import madoku.craft.config.JsonManagerSystem;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -10,7 +10,7 @@ public final class MadokuCraftLevels implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		StaticJsonSystem.initialize();
+		JsonManagerSystem.initialize();
 		MadokuLevels.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {

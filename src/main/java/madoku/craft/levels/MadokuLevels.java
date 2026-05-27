@@ -3,8 +3,9 @@ package madoku.craft.levels;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import madoku.craft.config.StaticJsonSystem;
-import madoku.craft.data.MadokuData;
+import madoku.craft.config.JsonManagerSystem;
+import madoku.craft.config.JsonStaticSystem;
+import madoku.craft.data.DataManagerSystem;
 import madoku.craft.network.MadokuLevelUpPayload;
 import madoku.craft.network.MadokuLevelsPayload;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -22,18 +23,16 @@ import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import static madoku.craft.clock.MadokuTicks.getGameplayTicks;
 
 public final class MadokuLevels {
 	private static final String CONFIG_FOLDER_NAME = "madoku-craft-levels";
 	private static final String CONFIG_FILE_NAME = "madoku-levels";
 	private static final String DATA_FOLDER_NAME = "madoku-craft-levels";
 	private static final String DATA_FILE_NAME = "madoku-levels";
-	private static final long AUTOSAVE_INTERVAL_TICKS = 60L * 20L;
 	private static final double DEFAULT_BASE_XP_REQUIREMENT = 5.0d;
 	private static final double DEFAULT_BASE_XP_MULTIPLIER = 0.10d;
 	private static final int DEFAULT_MAX_PLAYER_LEVEL = 40;
@@ -108,10 +107,10 @@ public final class MadokuLevels {
 		}
 
 		loadStaticConfig();
-		MadokuData.createWorldData(server, DATA_FOLDER_NAME, DATA_FILE_NAME, createDefaultData());
-		JsonObject data = MadokuData.loadWorldData(server, DATA_FOLDER_NAME, DATA_FILE_NAME);
+		JsonObject data = DataManagerSystem.loadWorldData(server, DATA_FOLDER_NAME, DATA_FILE_NAME, createDefaultData());
 		applyPersistedData(data);
-		lastAutosaveBucket = Math.floorDiv(getGameplayTicks(), AUTOSAVE_INTERVAL_TICKS);
+		long autoSaveIntervalTicks = DataManagerSystem.getAutoSaveIntervalTicks(server, DATA_FOLDER_NAME, DATA_FILE_NAME);
+		lastAutosaveBucket = Math.floorDiv(server.getTickCount(), autoSaveIntervalTicks);
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			ensurePlayerState(player);
 			applyPlayerAttributes(player);
@@ -124,7 +123,8 @@ public final class MadokuLevels {
 			return;
 		}
 
-		long bucket = Math.floorDiv(getGameplayTicks(), AUTOSAVE_INTERVAL_TICKS);
+		long autoSaveIntervalTicks = DataManagerSystem.getAutoSaveIntervalTicks(server, DATA_FOLDER_NAME, DATA_FILE_NAME);
+		long bucket = Math.floorDiv(server.getTickCount(), autoSaveIntervalTicks);
 		if (bucket != lastAutosaveBucket) {
 			lastAutosaveBucket = bucket;
 			savePersistedData(server);
@@ -136,7 +136,7 @@ public final class MadokuLevels {
 			return;
 		}
 
-		MadokuData.saveWorldData(server, DATA_FOLDER_NAME, DATA_FILE_NAME, toPersistedData());
+		DataManagerSystem.saveWorldData(server, DATA_FOLDER_NAME, DATA_FILE_NAME, toPersistedData());
 	}
 
 	public static void flushDirtySyncs(MinecraftServer server) {
@@ -199,7 +199,11 @@ public final class MadokuLevels {
 			return;
 		}
 
-		ensurePlayerState(newPlayer);
+		PlayerState state = ensurePlayerState(newPlayer);
+		if (!alive) {
+			state.currentXp = 0;
+			state.requiredXp = requiredXpForLevel(state.level);
+		}
 		applyPlayerAttributes(newPlayer);
 		markDirty(newPlayer.getUUID());
 	}
@@ -279,6 +283,7 @@ public final class MadokuLevels {
 
 	private static MadokuLevelsPayload createPayload(ServerPlayer player) {
 		PlayerState state = ensurePlayerState(player);
+		List<MadokuLevelStat> visibleStats = MadokuLevelStat.vanillaVisibleStats();
 		int effectiveLevel = Math.min(state.level, maxPlayerLevel());
 		int effectiveCurrentXp = state.level >= maxPlayerLevel() ? 0 : state.currentXp;
 		int effectiveRequiredXp = requiredXpForLevel(effectiveLevel);
@@ -289,6 +294,8 @@ public final class MadokuLevels {
 			effectiveRequiredXp,
 			state.availablePoints,
 			MadokuLevelStat.maxStatLevel(),
+			false,
+			MadokuLevelStat.encodeVisibleStats(visibleStats),
 			MadokuLevelStat.encodeLevels(state.statLevels)
 		);
 	}
@@ -326,11 +333,11 @@ public final class MadokuLevels {
 		Settings fallback = Settings.defaults();
 
 		try {
-			Path directory = StaticJsonSystem.getOrCreateGlobalSystemDirectory(CONFIG_FOLDER_NAME);
+			Path directory = JsonManagerSystem.getOrCreateGlobalSystemDirectory(CONFIG_FOLDER_NAME);
 			Path configFile = resolveJsonFile(directory, CONFIG_FILE_NAME);
-			JsonObject normalized = StaticJsonSystem.ensureManagedFile(configFile, defaults);
+			JsonObject normalized = JsonStaticSystem.ensureManagedFile(configFile, defaults);
 			Settings loaded = Settings.fromJson(normalized);
-			StaticJsonSystem.writeManagedFile(configFile, loaded.toConfigJson(), defaults);
+			JsonStaticSystem.writeManagedFile(configFile, loaded.toConfigJson(), defaults);
 			settings = loaded;
 		} catch (IOException | RuntimeException exception) {
 			settings = fallback;
@@ -539,15 +546,20 @@ public final class MadokuLevels {
 		private static Settings fromJson(JsonObject source) {
 			Settings defaults = defaults();
 			return new Settings(
-				clampDouble(getDouble(source, "base_xp_requirement", defaults.baseXpRequirement), 0.1d, 1_000_000.0d),
-				clampDouble(getDouble(source, "base_xp_multiplier", defaults.baseXpMultiplier), 0.0d, 1_000.0d),
-				clampInt(getLong(source, "max_player_level", defaults.maxPlayerLevel), 1, 1000),
-				clampInt(getLong(source, "max_stat_level", defaults.maxStatLevel), 1, 1000),
-				clampDouble(getDouble(source, "health_per_level", defaults.healthPerLevel), 0.0d, 1000.0d),
-				clampDouble(getDouble(source, "player_damage_per_level", defaults.playerDamagePerLevel), 0.0d, 1000.0d),
-				clampDouble(getDouble(source, "player_armor_per_level", defaults.playerArmorPerLevel), 0.0d, 1000.0d),
+				clampDouble(getDoubleCompat(source, "base-xp-requirement", "base_xp_requirement", defaults.baseXpRequirement), 0.1d, 1_000_000.0d),
+				clampDouble(getDoubleCompat(source, "base-xp-multiplier", "base_xp_multiplier", defaults.baseXpMultiplier), 0.0d, 1_000.0d),
+				clampInt(getLongCompat(source, "max-player-level", "max_player_level", defaults.maxPlayerLevel), 1, 1000),
+				clampInt(getLongCompat(source, "max-stat-level", "max_stat_level", defaults.maxStatLevel), 1, 1000),
+				clampDouble(getDoubleCompat(source, "health-per-level", "health_per_level", defaults.healthPerLevel), 0.0d, 1000.0d),
+				clampDouble(getDoubleCompat(source, "player-damage-per-level", "player_damage_per_level", defaults.playerDamagePerLevel), 0.0d, 1000.0d),
+				clampDouble(getDoubleCompat(source, "player-armor-per-level", "player_armor_per_level", defaults.playerArmorPerLevel), 0.0d, 1000.0d),
 				clampDouble(
-					getDouble(source, "player_movement_speed_per_level", defaults.playerMovementSpeedPerLevel),
+					getDoubleCompat(
+						source,
+						"player-movement-speed-per-level",
+						"player_movement_speed_per_level",
+						defaults.playerMovementSpeedPerLevel
+					),
 					0.0d,
 					1000.0d
 				)
@@ -556,15 +568,31 @@ public final class MadokuLevels {
 
 		private JsonObject toConfigJson() {
 			JsonObject root = new JsonObject();
-			root.addProperty("base_xp_requirement", baseXpRequirement);
-			root.addProperty("base_xp_multiplier", baseXpMultiplier);
-			root.addProperty("max_player_level", maxPlayerLevel);
-			root.addProperty("max_stat_level", maxStatLevel);
-			root.addProperty("health_per_level", healthPerLevel);
-			root.addProperty("player_damage_per_level", playerDamagePerLevel);
-			root.addProperty("player_armor_per_level", playerArmorPerLevel);
-			root.addProperty("player_movement_speed_per_level", playerMovementSpeedPerLevel);
+			root.addProperty("base-xp-requirement", baseXpRequirement);
+			root.addProperty("base-xp-multiplier", baseXpMultiplier);
+			root.addProperty("max-player-level", maxPlayerLevel);
+			root.addProperty("max-stat-level", maxStatLevel);
+			root.addProperty("health-per-level", healthPerLevel);
+			root.addProperty("player-damage-per-level", playerDamagePerLevel);
+			root.addProperty("player-armor-per-level", playerArmorPerLevel);
+			root.addProperty("player-movement-speed-per-level", playerMovementSpeedPerLevel);
 			return root;
 		}
+	}
+
+	private static long getLongCompat(JsonObject object, String primaryKey, String fallbackKey, long fallback) {
+		long primaryValue = getLong(object, primaryKey, Long.MIN_VALUE);
+		if (primaryValue != Long.MIN_VALUE) {
+			return primaryValue;
+		}
+		return getLong(object, fallbackKey, fallback);
+	}
+
+	private static double getDoubleCompat(JsonObject object, String primaryKey, String fallbackKey, double fallback) {
+		double primaryValue = getDouble(object, primaryKey, Double.NaN);
+		if (!Double.isNaN(primaryValue)) {
+			return primaryValue;
+		}
+		return getDouble(object, fallbackKey, fallback);
 	}
 }

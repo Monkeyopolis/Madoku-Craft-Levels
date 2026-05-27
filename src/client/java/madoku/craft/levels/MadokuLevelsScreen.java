@@ -25,8 +25,10 @@ public final class MadokuLevelsScreen extends Screen {
 	private static final int ENTRY_HEIGHT = 30;
 	private static final int ENTRY_GAP = 5;
 	private static final int ENTRY_COLUMN_GAP = 4;
+	private static final int VANILLA_ENTRY_LIMIT = 4;
 	private static final int ENTRY_BUTTON_WIDTH = 12;
 	private static final int ENTRY_BUTTON_HEIGHT = 12;
+	private static final int BOTTOM_MARGIN = 7;
 	private static final int ENTRY_SIDE_INSET = 4;
 	private static final int ENTRY_BUTTON_RIGHT_INSET = 4;
 	private static final int SUBTEXT_COLOR = 0xFF404040;
@@ -81,8 +83,9 @@ public final class MadokuLevelsScreen extends Screen {
 			int infoY = usernameY + 10;
 			int xpBarY = infoY + 7;
 			int xpTextY = xpBarY + XP_BAR_HEIGHT + 1;
-			int entriesTop = panelY + 47;
+			int entriesTop = entriesTop();
 			List<MadokuLevelStat> stats = snapshot.visibleStats();
+			int visibleEntries = Math.min(stats.size(), maxVisibleEntries(entriesTop));
 
 			String username = snapshot.username();
 			String levelText = "Level: " + snapshot.level();
@@ -106,7 +109,7 @@ public final class MadokuLevelsScreen extends Screen {
 			drawScaledCenteredText(guiGraphics, xpText, this.width / 2, xpTextY, INFO_TEXT_SCALE, SUBTEXT_COLOR);
 
 			int gridLeftX = panelX + (PANEL_WIDTH - ((ENTRY_WIDTH * 2) + ENTRY_COLUMN_GAP)) / 2;
-			for (int index = 0; index < stats.size(); index++) {
+			for (int index = 0; index < visibleEntries; index++) {
 				MadokuLevelStat stat = stats.get(index);
 				int row = index / 2;
 				int column = index % 2;
@@ -135,6 +138,7 @@ public final class MadokuLevelsScreen extends Screen {
 					ENTRY_WIDTH,
 					ENTRY_HEIGHT
 				);
+
 				guiGraphics.blit(
 					RenderPipelines.GUI_TEXTURED,
 					stat.iconTexture(),
@@ -166,11 +170,12 @@ public final class MadokuLevelsScreen extends Screen {
 		stateVersion = MadokuLevelsClientState.version();
 		MadokuLevelsClientState.Snapshot snapshot = MadokuLevelsClientState.snapshot();
 		int panelX = panelX();
-		int entriesTop = panelY() + 47;
+		int entriesTop = entriesTop();
 		List<MadokuLevelStat> stats = snapshot.visibleStats();
+		int visibleEntries = Math.min(stats.size(), maxVisibleEntries(entriesTop));
 		int gridLeftX = panelX + (PANEL_WIDTH - ((ENTRY_WIDTH * 2) + ENTRY_COLUMN_GAP)) / 2;
 
-		for (int index = 0; index < stats.size(); index++) {
+		for (int index = 0; index < visibleEntries; index++) {
 			MadokuLevelStat stat = stats.get(index);
 			int row = index / 2;
 			int column = index % 2;
@@ -197,7 +202,32 @@ public final class MadokuLevelsScreen extends Screen {
 		return (this.height - PANEL_HEIGHT) / 2;
 	}
 
-	private void drawScaledLeftText(Object guiGraphics, String text, int x, int y, float scale, int color) {
+	private int panelBottom() {
+		return panelY() + PANEL_HEIGHT;
+	}
+
+	private int entriesTop() {
+		return panelY() + 47;
+	}
+
+	private int rowsThatFit(int entriesTop) {
+		int availableHeight = panelBottom() - entriesTop - BOTTOM_MARGIN;
+		return Math.max(1, (availableHeight + ENTRY_GAP) / (ENTRY_HEIGHT + ENTRY_GAP));
+	}
+
+	private int maxVisibleEntries(int entriesTop) {
+		int rowLimited = rowsThatFit(entriesTop) * 2;
+		return Math.min(rowLimited, VANILLA_ENTRY_LIMIT);
+	}
+
+	private void drawScaledLeftText(
+		Object guiGraphics,
+		String text,
+		int x,
+		int y,
+		float scale,
+		int color
+	) {
 		if (text == null || text.isEmpty()) {
 			return;
 		}

@@ -24,7 +24,8 @@ public final class MadokuLevelsClientState {
 			Math.max(1, payload.requiredXp()),
 			Math.max(0, payload.availablePoints()),
 			Math.max(1, payload.maxStatLevel()),
-			MadokuLevelStat.visibleStats(),
+			payload.useAttributesContainer(),
+			visibleStatsForPayload(payload),
 			MadokuLevelStat.decodeLevels(payload.statLevels())
 		);
 		version++;
@@ -43,6 +44,16 @@ public final class MadokuLevelsClientState {
 		version++;
 	}
 
+	private static List<MadokuLevelStat> visibleStatsForPayload(MadokuLevelsPayload payload) {
+		List<MadokuLevelStat> decoded = MadokuLevelStat.decodeVisibleStats(payload.visibleStats());
+		if (!decoded.isEmpty()) {
+			return List.copyOf(decoded);
+		}
+		return payload.useAttributesContainer()
+			? MadokuLevelStat.attributeVisibleStats()
+			: MadokuLevelStat.vanillaVisibleStats();
+	}
+
 	public record Snapshot(
 		String username,
 		int level,
@@ -50,6 +61,7 @@ public final class MadokuLevelsClientState {
 		int requiredXp,
 		int availablePoints,
 		int maxStatLevel,
+		boolean useAttributesContainer,
 		List<MadokuLevelStat> visibleStats,
 		EnumMap<MadokuLevelStat, Integer> statLevels
 	) {
@@ -61,7 +73,8 @@ public final class MadokuLevelsClientState {
 				1,
 				0,
 				MadokuLevelStat.maxStatLevel(),
-				MadokuLevelStat.visibleStats(),
+				false,
+				MadokuLevelStat.vanillaVisibleStats(),
 				MadokuLevelStat.createDefaultLevels()
 			);
 		}
