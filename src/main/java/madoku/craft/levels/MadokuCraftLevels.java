@@ -1,6 +1,6 @@
 package madoku.craft.levels;
 
-import madoku.craft.config.StaticJsonSystem;
+import madoku.craft.api.MadokuAPIManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -10,22 +10,25 @@ public final class MadokuCraftLevels implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		StaticJsonSystem.initialize();
-		MadokuLevels.initialize();
+		MadokuLevelsManager.initialize();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			MadokuLevels.reset();
-			MadokuLevels.loadPersistedData(server);
+			MadokuLevelsManager.reset();
+			MadokuLevelsManager.loadPersistedData(server);
+		});
+
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+			MadokuLevelsManager.savePersistedData(server);
+			MadokuAPIManager.savePersistedData(server);
 		});
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-			MadokuLevels.savePersistedData(server);
-			MadokuLevels.reset();
+			MadokuLevelsManager.reset();
 		});
 
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
-			MadokuLevels.autosavePersistedData(server);
-			MadokuLevels.flushDirtySyncs(server);
+			MadokuLevelsManager.autosavePersistedData(server);
+			MadokuLevelsManager.flushDirtySyncs(server);
 		});
 	}
 }
