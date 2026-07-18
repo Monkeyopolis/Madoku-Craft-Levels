@@ -1,5 +1,6 @@
 package madoku.craft.levels;
 
+import madoku.craft.levels.MadokuLevelsManager.LevelStat;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -84,7 +85,7 @@ public final class MadokuLevelsScreen extends Screen {
 			int xpBarY = infoY + 7;
 			int xpTextY = xpBarY + XP_BAR_HEIGHT + 1;
 			int entriesTop = entriesTop();
-			List<MadokuLevelStat> stats = snapshot.visibleStats();
+			List<LevelStat> stats = snapshot.visibleStats();
 			int visibleEntries = Math.min(stats.size(), maxVisibleEntries(entriesTop));
 
 			String username = snapshot.username();
@@ -110,7 +111,7 @@ public final class MadokuLevelsScreen extends Screen {
 
 			int gridLeftX = panelX + (PANEL_WIDTH - ((ENTRY_WIDTH * 2) + ENTRY_COLUMN_GAP)) / 2;
 			for (int index = 0; index < visibleEntries; index++) {
-				MadokuLevelStat stat = stats.get(index);
+				LevelStat stat = stats.get(index);
 				int row = index / 2;
 				int column = index % 2;
 				int entryX = gridLeftX + column * (ENTRY_WIDTH + ENTRY_COLUMN_GAP);
@@ -124,7 +125,7 @@ public final class MadokuLevelsScreen extends Screen {
 				int textRight = buttonX - 4;
 				int textCenterX = textLeft + Math.max(0, (textRight - textLeft) / 2);
 				int statLevel = snapshot.statLevel(stat);
-				String statLevelText = statLevel + "/" + snapshot.maxStatLevel();
+				String statLevelText = statLevel + "/" + snapshot.maxStatLevel(stat);
 
 				guiGraphics.blit(
 					RenderPipelines.GUI_TEXTURED,
@@ -171,12 +172,12 @@ public final class MadokuLevelsScreen extends Screen {
 		MadokuLevelsClientState.Snapshot snapshot = MadokuLevelsClientState.snapshot();
 		int panelX = panelX();
 		int entriesTop = entriesTop();
-		List<MadokuLevelStat> stats = snapshot.visibleStats();
+		List<LevelStat> stats = snapshot.visibleStats();
 		int visibleEntries = Math.min(stats.size(), maxVisibleEntries(entriesTop));
 		int gridLeftX = panelX + (PANEL_WIDTH - ((ENTRY_WIDTH * 2) + ENTRY_COLUMN_GAP)) / 2;
 
 		for (int index = 0; index < visibleEntries; index++) {
-			MadokuLevelStat stat = stats.get(index);
+			LevelStat stat = stats.get(index);
 			int row = index / 2;
 			int column = index % 2;
 			int entryX = gridLeftX + column * (ENTRY_WIDTH + ENTRY_COLUMN_GAP);
@@ -189,7 +190,7 @@ public final class MadokuLevelsScreen extends Screen {
 				.build();
 			button.active = snapshot.hasData()
 				&& snapshot.availablePoints() > 0
-				&& snapshot.statLevel(stat) < snapshot.maxStatLevel();
+				&& snapshot.statLevel(stat) < snapshot.maxStatLevel(stat);
 			this.addRenderableWidget(button);
 		}
 	}

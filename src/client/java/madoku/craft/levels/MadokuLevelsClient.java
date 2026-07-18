@@ -3,6 +3,7 @@ package madoku.craft.levels;
 import com.mojang.blaze3d.platform.InputConstants;
 import madoku.craft.network.MadokuLevelUpPayload;
 import madoku.craft.network.MadokuLevelsPayload;
+import madoku.craft.levels.MadokuLevelsManager.LevelStat;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -36,13 +37,13 @@ public final class MadokuLevelsClient {
 		}
 
 		boolean openKeyDown = InputConstants.isKeyDown(client.getWindow(), GLFW.GLFW_KEY_K);
-		if (openKeyDown && !wasOpenKeyDown && client.screen == null) {
-			client.setScreen(new MadokuLevelsScreen());
+		if (openKeyDown && !wasOpenKeyDown && client.gui.screen() == null) {
+			client.setScreenAndShow(new MadokuLevelsScreen());
 		}
 		wasOpenKeyDown = openKeyDown;
 	}
 
-	public static void requestStatUpgrade(MadokuLevelStat stat) {
+	public static void requestStatUpgrade(LevelStat stat) {
 		if (stat == null) {
 			return;
 		}
