@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import madoku.craft.api.data.DataPlayerManager;
 import madoku.craft.api.json.JSONFormatManager;
-import madoku.craft.api.json.MadokuJSONManager;
 import madoku.craft.api.sync.SyncPlayerManager;
 import madoku.craft.api.time.MadokuTimeManager;
 import madoku.craft.levels.MadokuLevelsManager.LevelStat;
@@ -13,8 +12,6 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,7 +71,6 @@ public final class LevelsPlayerManager {
 		if (server == null) return;
 		LevelsConfigManager.reload();
 		JsonObject data = DataPlayerManager.getSystemData(DATA_FILE_NAME);
-		if (!hasPlayers(data)) data = loadLegacyWorldData(server);
 		applyPersistedData(data);
 		long interval = DataPlayerManager.getAutoSaveIntervalTicks();
 		lastAutosaveBucket = Math.floorDiv(MadokuTimeManager.getGameplayTicks(), Math.max(1L, interval));
@@ -138,26 +134,17 @@ public final class LevelsPlayerManager {
 			try {
 				UUID playerId = UUID.fromString(readString(playerData, "uuid", ""));
 				PlayerState state = PlayerState.defaults();
-				state.level = Math.min(maxPlayerLevel(), Math.max(1, readIntCompat(playerData, "level", 1)));
-				state.currentXp = Math.max(0, readIntCompat(playerData, "current-xp", readIntCompat(playerData, "currentXp", 0)));
+				state.level = Math.min(maxPlayerLevel(), Math.max(1, readInt(playerData, "level", 1)));
+				state.currentXp = Math.max(0, readInt(playerData, "current-xp", 0));
 				state.requiredXp = requiredXpForLevel(state.level);
-				state.availablePoints = Math.max(0, readIntCompat(playerData, "available-points", readIntCompat(playerData, "availablePoints", 1)));
+				state.availablePoints = Math.max(0, readInt(playerData, "available-points", 1));
 				JsonObject stats = object(playerData, "stats");
-				for (LevelStat stat : LevelStat.values()) state.statLevels.put(stat, stat.clampLevel(readIntCompat(stats, stat.id(), LevelStat.DEFAULT_LEVEL)));
+				for (LevelStat stat : LevelStat.values()) state.statLevels.put(stat, stat.clampLevel(readInt(stats, stat.id(), LevelStat.DEFAULT_LEVEL)));
 				PLAYER_STATES.put(playerId, state);
 			} catch (IllegalArgumentException ignored) { }
 		}
 	}
 
-	private static JsonObject loadLegacyWorldData(MinecraftServer server) {
-		Path file = MadokuJSONManager.getWorldRootDirectory(server).resolve("madoku-craft/madoku-craft-levels/madoku-levels.json");
-		try {
-			JsonObject root = JSONFormatManager.readManagedDocument(file).data();
-			JsonObject main = object(root, "main");
-			return main.has("players") ? main : null;
-		} catch (IOException | RuntimeException ignored) { return null; }
-	}
-	private static boolean hasPlayers(JsonObject data) { return data != null && data.get("players") != null && data.get("players").isJsonArray(); }
 	private static JsonObject toPersistedData() {
 		JsonArray players = new JsonArray();
 		for (Map.Entry<UUID, PlayerState> entry : PLAYER_STATES.entrySet()) {
@@ -172,7 +159,7 @@ public final class LevelsPlayerManager {
 		return JSONFormatManager.object().put("players", players).build();
 	}
 	private static JsonObject object(JsonObject source, String key) { JsonElement e = source == null ? null : source.get(key); return e != null && e.isJsonObject() ? e.getAsJsonObject() : new JsonObject(); }
-	private static int readIntCompat(JsonObject source, String key, int fallback) { try { return source != null && source.has(key) ? source.get(key).getAsInt() : fallback; } catch (RuntimeException e) { return fallback; } }
+	private static int readInt(JsonObject source, String key, int fallback) { try { return source != null && source.has(key) ? source.get(key).getAsInt() : fallback; } catch (RuntimeException e) { return fallback; } }
 	private static String readString(JsonObject source, String key, String fallback) { try { return source != null && source.has(key) ? source.get(key).getAsString() : fallback; } catch (RuntimeException e) { return fallback; } }
 
 	public static final class PlayerState {

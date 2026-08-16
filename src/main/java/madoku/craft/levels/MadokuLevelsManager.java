@@ -45,9 +45,9 @@ public final class MadokuLevelsManager {
 
 	public enum LevelStat {
 		HEALTH("health", "Health", "health", 0xFF6B6B, 1.0d),
-		PLAYER_DAMAGE("player_damage", "Strength", "strength", 0xF4A261, 0.2d),
-		PLAYER_ARMOR("player_armor", "Defense", "defense", 0x4D96FF, 0.2d),
-		PLAYER_MOVEMENT_SPEED("player_movement_speed", "Speed", "speed", 0x43AA8B, 0.001d);
+		STRENGTH("strength", "Strength", "strength", 0xF4A261, 0.2d),
+		ARMOR("armor", "Armor", "defense", 0x4D96FF, 0.4d),
+		MOVEMENT_SPEED("movement-speed", "Speed", "speed", 0x43AA8B, 0.001d);
 
 		public static final int DEFAULT_LEVEL = 0;
 		private final String id;
@@ -80,7 +80,8 @@ public final class MadokuLevelsManager {
 
 		public static LevelStat fromId(String id) {
 			if (id == null || id.isBlank()) return null;
-			for (LevelStat stat : values()) if (stat.id.equalsIgnoreCase(id.trim())) return stat;
+			String normalized = id.trim();
+			for (LevelStat stat : values()) if (stat.id.equalsIgnoreCase(normalized)) return stat;
 			return null;
 		}
 

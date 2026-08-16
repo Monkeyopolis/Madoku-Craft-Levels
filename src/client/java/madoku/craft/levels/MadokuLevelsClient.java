@@ -5,14 +5,25 @@ import madoku.craft.network.MadokuLevelUpPayload;
 import madoku.craft.network.MadokuLevelsPayload;
 import madoku.craft.levels.MadokuLevelsManager.LevelStat;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public final class MadokuLevelsClient {
 	private static boolean initialized = false;
-	private static boolean wasOpenKeyDown = false;
+	private static final KeyMapping.Category MADOKU_LEVELS_CATEGORY = KeyMapping.Category.register(
+		Identifier.fromNamespaceAndPath(MadokuCraftLevels.MOD_ID, "levels")
+	);
+	private static final KeyMapping OPEN_LEVELS_KEY = new KeyMapping(
+		"key.madoku-craft-levels.open_levels",
+		InputConstants.Type.KEYSYM,
+		GLFW.GLFW_KEY_K,
+		MADOKU_LEVELS_CATEGORY
+	);
 
 	private MadokuLevelsClient() {
 	}
@@ -22,6 +33,7 @@ public final class MadokuLevelsClient {
 			return;
 		}
 
+		KeyMappingHelper.registerKeyMapping(OPEN_LEVELS_KEY);
 		ClientPlayNetworking.registerGlobalReceiver(MadokuLevelsPayload.TYPE, (payload, context) ->
 			MadokuLevelsClientState.applyPayload(payload)
 		);
@@ -32,15 +44,12 @@ public final class MadokuLevelsClient {
 
 	private static void handleClientTick(Minecraft client) {
 		if (client == null || client.player == null) {
-			wasOpenKeyDown = false;
 			return;
 		}
 
-		boolean openKeyDown = InputConstants.isKeyDown(client.getWindow(), GLFW.GLFW_KEY_K);
-		if (openKeyDown && !wasOpenKeyDown && client.gui.screen() == null) {
+		if (OPEN_LEVELS_KEY.consumeClick() && client.gui.screen() == null) {
 			client.setScreenAndShow(new MadokuLevelsScreen());
 		}
-		wasOpenKeyDown = openKeyDown;
 	}
 
 	public static void requestStatUpgrade(LevelStat stat) {

@@ -35,9 +35,8 @@ public final class LevelsConfigManager {
 		try {
 			Path directory = MadokuJSONManager.getOrCreateGlobalSystemDirectory(CONFIG_FOLDER_NAME);
 			Path file = directory.resolve(CONFIG_FILE_NAME + ".json");
-			JsonObject source = JSONFormatManager.readManagedDocument(file).data();
 			JsonObject normalized = JSONFormatManager.ensureManagedFile(file, fallback.toJson());
-			Settings loaded = Settings.fromJson(normalized, source);
+			Settings loaded = Settings.fromJson(normalized);
 			JSONFormatManager.writeManagedFile(file, loaded.toJson(), fallback.toJson());
 			settings = loaded;
 		} catch (IOException | RuntimeException exception) {
@@ -63,29 +62,21 @@ public final class LevelsConfigManager {
 			for (LevelStat stat : LevelStat.values()) stats.put(stat, StatSettings.defaultsFor(stat));
 			return new Settings(true, PlayerSettings.defaults(), stats);
 		}
-		private static Settings fromJson(JsonObject source, JsonObject legacySource) {
+		private static Settings fromJson(JsonObject source) {
 			Settings defaults = defaults();
-			JsonObject legacyMain = object(legacySource, "main");
-			boolean legacyFormat = !legacyMain.isEmpty() && object(legacySource, "levels").isEmpty();
 			JsonObject levels = object(source, "levels");
-			if (levels.isEmpty()) levels = object(legacySource, "levels");
 			JsonObject player = object(levels, "player");
 			EnumMap<LevelStat, StatSettings> stats = new EnumMap<>(LevelStat.class);
 			JsonObject statsObject = object(source, "stats");
-			if (statsObject.isEmpty()) statsObject = object(legacySource, "stats");
 			for (LevelStat stat : LevelStat.values()) {
-				JsonObject statSource = legacyFormat ? legacyStat(legacyMain, stat) : object(statsObject, stat.id());
-				stats.put(stat, StatSettings.fromJson(statSource, defaults.stats().get(stat)));
+				stats.put(stat, StatSettings.fromJson(object(statsObject, stat.id()), defaults.stats().get(stat)));
 			}
-			boolean enabled = legacyFormat
-				? readBoolean(object(legacySource, "general"), "enabled", true)
-				: readBoolean(source, "enabled", defaults.enabled());
 			return new Settings(
-				enabled,
+				readBoolean(source, "enabled", defaults.enabled()),
 				new PlayerSettings(
-					legacyFormat ? readPositiveInt(legacyMain, "max-player-level", defaults.player().maxLevel()) : readPositiveInt(player, "max-level", defaults.player().maxLevel()),
-					legacyFormat ? readNonNegativeDouble(legacyMain, "base-xp-requirement", defaults.player().baseXpRequirement()) : readNonNegativeDouble(player, "base-xp-requirement", defaults.player().baseXpRequirement()),
-					legacyFormat ? readNonNegativeDouble(legacyMain, "base-xp-multiplier", defaults.player().baseXpMultiplier()) : readNonNegativeDouble(player, "base-xp-multiplier", defaults.player().baseXpMultiplier())
+					readPositiveInt(player, "max-level", defaults.player().maxLevel()),
+					readNonNegativeDouble(player, "base-xp-requirement", defaults.player().baseXpRequirement()),
+					readNonNegativeDouble(player, "base-xp-multiplier", defaults.player().baseXpMultiplier())
 				),
 				stats
 			);
@@ -102,7 +93,7 @@ public final class LevelsConfigManager {
 	}
 
 	public record PlayerSettings(int maxLevel, double baseXpRequirement, double baseXpMultiplier) {
-		private static PlayerSettings defaults() { return new PlayerSettings(40, 5.0d, 0.1d); }
+		private static PlayerSettings defaults() { return new PlayerSettings(60, 5.0d, 0.1d); }
 	}
 
 	public record StatSettings(int maxLevel, IncrementType type, double value) {
@@ -113,24 +104,12 @@ public final class LevelsConfigManager {
 			JsonObject increment = object(source, "level-increment");
 			return new StatSettings(readPositiveInt(source, "max-level", defaults.maxLevel()),
 				IncrementType.fromId(readString(increment, "type", defaults.type().id())),
-				readNonNegativeDouble(increment, "value", readLegacyValue(source, defaults.value())));
+				readNonNegativeDouble(increment, "value", defaults.value()));
 		}
 		private JsonObject toJson() { return JSONFormatManager.object().put("max-level", maxLevel)
 			.object("level-increment", increment -> increment.put("type", type.id()).put("value", value)).build(); }
 	}
 
-	private static JsonObject legacyStat(JsonObject main, LevelStat stat) {
-		String key = switch (stat) {
-			case HEALTH -> "health-per-level";
-			case PLAYER_DAMAGE -> "player-damage-per-level";
-			case PLAYER_ARMOR -> "player-armor-per-level";
-			case PLAYER_MOVEMENT_SPEED -> "player-movement-speed-per-level";
-		};
-		JsonObject result = new JsonObject();
-		if (main != null && main.has(key)) result.add("level-increment", JSONFormatManager.object().put("value", main.get(key)).put("type", "flat").build());
-		return result;
-	}
-	private static double readLegacyValue(JsonObject source, double fallback) { return readNonNegativeDouble(source, "value", fallback); }
 	private static JsonObject object(JsonObject source, String key) { JsonElement e = source == null ? null : source.get(key); return e != null && e.isJsonObject() ? e.getAsJsonObject() : new JsonObject(); }
 	private static boolean readBoolean(JsonObject source, String key, boolean fallback) { try { return source != null && source.has(key) ? source.get(key).getAsBoolean() : fallback; } catch (RuntimeException e) { return fallback; } }
 	private static String readString(JsonObject source, String key, String fallback) { try { return source != null && source.has(key) ? source.get(key).getAsString() : fallback; } catch (RuntimeException e) { return fallback; } }

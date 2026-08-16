@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "madoku.craft.levels.mixin",
+	"package": "madoku.craft.mixin.levels",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
 		"PlayerExperienceMadokuLevelsMixin"

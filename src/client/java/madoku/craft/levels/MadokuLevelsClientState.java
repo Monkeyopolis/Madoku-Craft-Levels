@@ -27,7 +27,7 @@ public final class MadokuLevelsClientState {
 			decodeMaxStatLevels(payload.maxStatLevels()),
 			payload.useAttributesContainer(),
 			visibleStatsForPayload(payload),
-			LevelStat.decodeLevels(payload.statLevels())
+			decodeStatLevels(payload.statLevels(), decodeMaxStatLevels(payload.maxStatLevels()))
 		);
 		version++;
 	}
@@ -51,6 +51,22 @@ public final class MadokuLevelsClientState {
 			return List.copyOf(decoded);
 		}
 		return LevelStat.visibleStats();
+	}
+
+	private static EnumMap<LevelStat, Integer> decodeStatLevels(String encoded, EnumMap<LevelStat, Integer> maxLevels) {
+		EnumMap<LevelStat, Integer> levels = LevelStat.createDefaultLevels();
+		if (encoded == null || encoded.isBlank()) return levels;
+		for (String entry : encoded.split(";")) {
+			String[] pair = entry.split("=", 2);
+			if (pair.length != 2) continue;
+			LevelStat stat = LevelStat.fromId(pair[0]);
+			if (stat == null) continue;
+			try {
+				int maximum = maxLevels.getOrDefault(stat, stat.maxLevel());
+				levels.put(stat, Math.max(LevelStat.DEFAULT_LEVEL, Math.min(maximum, Integer.parseInt(pair[1].trim()))));
+			} catch (NumberFormatException ignored) { }
+		}
+		return levels;
 	}
 
 	private static java.util.EnumMap<LevelStat, Integer> decodeMaxStatLevels(String encoded) {

@@ -1,4 +1,4 @@
-package madoku.craft.levels.mixin;
+package madoku.craft.mixin.levels;
 
 import madoku.craft.levels.MadokuLevelsManager;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,11 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Player.class)
 public abstract class PlayerExperienceMadokuLevelsMixin {
 	@Inject(method = "giveExperiencePoints", at = @At("HEAD"))
-	private void madokuCraftLevels$gainMadokuLevelsXp(int experience, CallbackInfo callbackInfo) {
-		if (experience <= 0 || !((Object) this instanceof ServerPlayer serverPlayer)) {
-			return;
-		}
-
+	private void madokuCraft$gainMadokuLevelsXp(int experience, CallbackInfo callbackInfo) {
+		if (experience <= 0 || !((Object) this instanceof ServerPlayer serverPlayer)) return;
 		MadokuLevelsManager.addXp(serverPlayer, experience);
 	}
 }

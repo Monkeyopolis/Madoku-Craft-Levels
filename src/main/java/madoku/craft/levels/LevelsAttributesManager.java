@@ -10,7 +10,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 /** Applies only the attributes owned by the Levels mod. */
 public final class LevelsAttributesManager {
 	private static final Identifier HEALTH_MODIFIER = id("levels_health");
-	private static final Identifier DAMAGE_MODIFIER = id("levels_damage");
+	private static final Identifier STRENGTH_MODIFIER = id("levels_strength");
 	private static final Identifier ARMOR_MODIFIER = id("levels_armor");
 	private static final Identifier MOVEMENT_SPEED_MODIFIER = id("levels_movement_speed");
 	private LevelsAttributesManager() { }
@@ -21,9 +21,9 @@ public final class LevelsAttributesManager {
 		if (player == null) return;
 		LevelsPlayerManager.PlayerState state = LevelsPlayerManager.state(player);
 		apply(player.getAttribute(Attributes.MAX_HEALTH), HEALTH_MODIFIER, valueAtLevel(player, LevelStat.HEALTH, state.statLevel(LevelStat.HEALTH)));
-		apply(player.getAttribute(Attributes.ATTACK_DAMAGE), DAMAGE_MODIFIER, valueAtLevel(player, LevelStat.PLAYER_DAMAGE, state.statLevel(LevelStat.PLAYER_DAMAGE)));
-		apply(player.getAttribute(Attributes.ARMOR), ARMOR_MODIFIER, valueAtLevel(player, LevelStat.PLAYER_ARMOR, state.statLevel(LevelStat.PLAYER_ARMOR)));
-		apply(player.getAttribute(Attributes.MOVEMENT_SPEED), MOVEMENT_SPEED_MODIFIER, valueAtLevel(player, LevelStat.PLAYER_MOVEMENT_SPEED, state.statLevel(LevelStat.PLAYER_MOVEMENT_SPEED)));
+		apply(player.getAttribute(Attributes.ATTACK_DAMAGE), STRENGTH_MODIFIER, valueAtLevel(player, LevelStat.STRENGTH, state.statLevel(LevelStat.STRENGTH)));
+		apply(player.getAttribute(Attributes.ARMOR), ARMOR_MODIFIER, valueAtLevel(player, LevelStat.ARMOR, state.statLevel(LevelStat.ARMOR)));
+		apply(player.getAttribute(Attributes.MOVEMENT_SPEED), MOVEMENT_SPEED_MODIFIER, valueAtLevel(player, LevelStat.MOVEMENT_SPEED, state.statLevel(LevelStat.MOVEMENT_SPEED)));
 		if (player.getHealth() > player.getMaxHealth()) player.setHealth(player.getMaxHealth());
 	}
 
@@ -38,15 +38,15 @@ public final class LevelsAttributesManager {
 	private static double baseValue(ServerPlayer player, LevelStat stat) {
 		if (player == null) return switch (stat) {
 			case HEALTH -> 20.0d;
-			case PLAYER_DAMAGE -> 1.0d;
-			case PLAYER_ARMOR -> 0.0d;
-			case PLAYER_MOVEMENT_SPEED -> 0.1d;
+			case STRENGTH -> 1.0d;
+			case ARMOR -> 0.0d;
+			case MOVEMENT_SPEED -> 0.1d;
 		};
 		return switch (stat) {
 			case HEALTH -> baseAttribute(player, Attributes.MAX_HEALTH, 20.0d);
-			case PLAYER_DAMAGE -> baseAttribute(player, Attributes.ATTACK_DAMAGE, 1.0d);
-			case PLAYER_ARMOR -> baseAttribute(player, Attributes.ARMOR, 0.0d);
-			case PLAYER_MOVEMENT_SPEED -> baseAttribute(player, Attributes.MOVEMENT_SPEED, 0.1d);
+			case STRENGTH -> baseAttribute(player, Attributes.ATTACK_DAMAGE, 1.0d);
+			case ARMOR -> baseAttribute(player, Attributes.ARMOR, 0.0d);
+			case MOVEMENT_SPEED -> baseAttribute(player, Attributes.MOVEMENT_SPEED, 0.1d);
 		};
 	}
 
