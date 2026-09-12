@@ -1,14 +1,7 @@
 {
-	"required": true,
-	"package": "madoku.craft.levels.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"PlayerExperienceMadokuLevelsMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
-	}
+  "required": true,
+  "package": "madoku.craft.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["levels.PlayerExperienceMadokuLevelsMixin"],
+  "injectors": { "defaultRequire": 1 }
 }

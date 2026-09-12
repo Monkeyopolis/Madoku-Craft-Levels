@@ -1,22 +1,23 @@
-## Madoku Craft: Levels
+## Overview:
 
-Madoku Craft: Levels is a configurable leveling system.
-You can upgrade your Stats by allocating points into an Attribute.
-You can customize most of these features in the CONFIG files.
+Madoku Craft: Levels allows you to upgrade certain stats by allocating points into an attribute.
+You can customize this feature in the config files.
 
 ## Dependencies:
 
 - Fabric API
-- Madoku Craft API
+- Madoku Craft: Core
 
-## Implementation:
+## Features:
 
-Levels:
+**Levels:**
 
-- You can level up by gaining XP.
-- You can open up the Menu by pressing K.
+- You can level up by gaining experience points.
+- To allocate points to upgrade an attribute, open up the dedicated menu.
+- By default, the keybind is set to K.
+- This keybind is customizable in the in-game settings.
 
-Points:
+**Points:**
 
 - You gain points by leveling up.
-- Press the buttons to allocate a point.
+- You can allocate a point by pressing the dedicated button to the attribute you want to upgrade.

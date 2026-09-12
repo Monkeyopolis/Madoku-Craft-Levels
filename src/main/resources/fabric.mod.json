@@ -1,34 +1,22 @@
 {
-	"schemaVersion": 1,
-	"id": "madoku-craft-levels",
-	"version": "${version}",
-	"name": "Madoku Craft: Levels",
-	"description": "A configurable Leveling system.",
-	"authors": [
-		"Monkeyopolis"
-	],
-	"contact": {
-		"homepage": "https://github.com/Monkeyopolis/Madoku-Craft-Levels"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/madoku-craft-levels/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"madoku.craft.levels.MadokuCraftLevels"
-		],
-		"client": [
-			"madoku.craft.levels.client.MadokuCraftLevelsClient"
-		]
-	},
-	"mixins": [
-		"madoku-craft-levels.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.18.6",
-		"minecraft": "~${minecraft_version}",
-		"java": ">=21",
-		"fabric-api": "*",
-		"madoku-craft-api": ">=${madoku_craft_api_mod_version}"
-	}
+  "schemaVersion": 1,
+  "id": "madoku-craft-levels",
+  "version": "${version}",
+  "name": "Madoku Craft: Levels",
+  "description": "A configurable player leveling system mod.",
+  "authors": ["Monkeyopolis"],
+  "license": "CC0-1.0",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["madoku.craft.java.levels.MadokuLevelsInitializer"],
+    "client": ["madoku.craft.java.levels.MadokuLevelsClientInitializer"]
+  },
+  "mixins": ["madoku-craft-levels.mixins.json"],
+  "depends": {
+    "fabricloader": "${loader_version}",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "${fabric_api_version}",
+    "madoku-craft-core": "*"
+  }
 }
