@@ -23,14 +23,44 @@ public final class LevelsAttributesManager {
 	public static void applyPlayerAttributes(ServerPlayer player) {
 		if (player == null) return;
 		LevelsPlayerState state = LevelsPlayerManager.state(player);
-		apply(player.getAttribute(Attributes.MAX_HEALTH), HEALTH_MODIFIER, valueAtLevel(player, LevelStat.HEALTH, state.statLevel(LevelStat.HEALTH)));
-		LevelsFeatureAPIManager.applyPlayerMaxHealthAbilityBonus(player);
-		apply(player.getAttribute(Attributes.ATTACK_DAMAGE), STRENGTH_MODIFIER, valueAtLevel(player, LevelStat.STRENGTH, state.statLevel(LevelStat.STRENGTH)));
-		LevelsFeatureAPIManager.applyPlayerDamageAbilityBonus(player);
-		apply(player.getAttribute(Attributes.ARMOR), ARMOR_MODIFIER, valueAtLevel(player, LevelStat.ARMOR, state.statLevel(LevelStat.ARMOR)));
-		LevelsFeatureAPIManager.applyPlayerArmorAbilityBonus(player);
-		apply(player.getAttribute(Attributes.LUCK), LUCK_MODIFIER, valueAtLevel(player, LevelStat.LUCK, state.statLevel(LevelStat.LUCK)));
-		apply(player.getAttribute(Attributes.MOVEMENT_SPEED), MOVEMENT_SPEED_MODIFIER, valueAtLevel(player, LevelStat.MOVEMENT_SPEED, state.statLevel(LevelStat.MOVEMENT_SPEED)));
+		for (LevelStat stat : LevelStat.values()) applyPlayerAttribute(player, state, stat);
+		clampHealth(player);
+	}
+
+	/** Applies one level stat without rebuilding unrelated attributes. */
+	static void applyPlayerAttribute(ServerPlayer player, LevelStat stat) {
+		if (player == null || stat == null) return;
+		applyPlayerAttribute(player, LevelsPlayerManager.state(player), stat);
+	}
+
+	private static void applyPlayerAttribute(ServerPlayer player, LevelsPlayerState state, LevelStat stat) {
+		if (player == null || state == null || stat == null) return;
+		switch (stat) {
+			case HEALTH -> {
+				apply(player.getAttribute(Attributes.MAX_HEALTH), HEALTH_MODIFIER,
+					valueAtLevel(player, LevelStat.HEALTH, state.statLevel(LevelStat.HEALTH)));
+				LevelsFeatureAPIManager.applyPlayerMaxHealthAbilityBonus(player);
+				clampHealth(player);
+			}
+			case STRENGTH -> {
+				apply(player.getAttribute(Attributes.ATTACK_DAMAGE), STRENGTH_MODIFIER,
+					valueAtLevel(player, LevelStat.STRENGTH, state.statLevel(LevelStat.STRENGTH)));
+				LevelsFeatureAPIManager.applyPlayerDamageAbilityBonus(player);
+			}
+			case ARMOR -> {
+				apply(player.getAttribute(Attributes.ARMOR), ARMOR_MODIFIER,
+					valueAtLevel(player, LevelStat.ARMOR, state.statLevel(LevelStat.ARMOR)));
+				LevelsFeatureAPIManager.applyPlayerArmorAbilityBonus(player);
+			}
+			case LUCK -> apply(player.getAttribute(Attributes.LUCK), LUCK_MODIFIER,
+				valueAtLevel(player, LevelStat.LUCK, state.statLevel(LevelStat.LUCK)));
+			case MOVEMENT_SPEED -> apply(player.getAttribute(Attributes.MOVEMENT_SPEED), MOVEMENT_SPEED_MODIFIER,
+				valueAtLevel(player, LevelStat.MOVEMENT_SPEED, state.statLevel(LevelStat.MOVEMENT_SPEED)));
+			case HUNGER -> { }
+		}
+	}
+
+	private static void clampHealth(ServerPlayer player) {
 		if (player.getHealth() > player.getMaxHealth()) player.setHealth(player.getMaxHealth());
 	}
 

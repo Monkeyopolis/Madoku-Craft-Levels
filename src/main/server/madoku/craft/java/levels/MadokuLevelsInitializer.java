@@ -11,5 +11,6 @@ public final class MadokuLevelsInitializer implements ModInitializer, MadokuStan
 	@Override public void initialize() { MadokuLevelsManager.initialize(); }
 	@Override public void reset() { MadokuLevelsManager.reset(); }
 	@Override public void loadPersistedData(MinecraftServer server) { MadokuLevelsManager.loadPersistedData(server); }
+	@Override public void onServerStopping(MinecraftServer server) { MadokuLevelsManager.savePersistedData(server); }
 	@Override public void onServerTick(MinecraftServer server) { MadokuLevelsManager.flushDirtySyncs(server); }
 }

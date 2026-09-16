@@ -8,6 +8,7 @@ import madoku.craft.java.core.data.PlayerDataAPIManager;
 import madoku.craft.java.core.sync.SyncPlayerAPIManager;
 import madoku.craft.java.core.time.TimeAPIManager;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -29,6 +30,11 @@ public final class LevelsPlayerManager {
 	public static void initialize() {
 		ServerPlayerEvents.JOIN.register(LevelsPlayerManager::handlePlayerJoin);
 		ServerPlayerEvents.AFTER_RESPAWN.register(LevelsPlayerManager::handlePlayerRespawn);
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+		if (handler != null && handler.player != null) {
+			persistCurrentState(handler.player);
+		}
+		});
 	}
 
 	public static void reset() {
@@ -46,16 +52,18 @@ public final class LevelsPlayerManager {
 		LevelsPlayerState state = state(player);
 		int maximum = maxPlayerLevel();
 		if (state.level >= maximum) return;
+		boolean leveledUp = false;
 		state.currentXp += xpAmount;
 		while (state.currentXp >= state.requiredXp && state.level < maximum) {
 			state.currentXp -= state.requiredXp;
 			state.level++;
 			state.availablePoints++;
 			state.requiredXp = requiredXpForLevel(state.level);
+			leveledUp = true;
 		}
 		if (state.level >= maximum) state.currentXp = 0;
-		LevelsAttributesManager.applyPlayerAttributes(player);
 		markDirty(player.getUUID());
+		if (leveledUp) persistCurrentState(player);
 	}
 
 	public static void upgradeStat(ServerPlayer player, String statId) {
@@ -67,9 +75,10 @@ public final class LevelsPlayerManager {
 		if (state.availablePoints <= 0 || current >= stat.maxLevel()) return;
 		state.statLevels.put(stat, stat.clampLevel(current + 1));
 		state.availablePoints--;
-		LevelsAttributesManager.applyPlayerAttributes(player);
-		LevelsFeatureAPIManager.handleMaximumHungerChanged(player);
+		LevelsAttributesManager.applyPlayerAttribute(player, stat);
+		if (stat == LevelStat.HUNGER) LevelsFeatureAPIManager.handleMaximumHungerChanged(player);
 		markDirty(player.getUUID());
+		persistCurrentState(player);
 	}
 
 	public static int getPlayerHungerBonusPoints(ServerPlayer player) {
@@ -86,6 +95,7 @@ public final class LevelsPlayerManager {
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			state(player);
 			LevelsAttributesManager.applyPlayerAttributes(player);
+			LevelsFeatureAPIManager.handleMaximumHungerChanged(player);
 			LevelsFeatureAPIManager.restoreJoinHealth(player);
 			markDirty(player.getUUID());
 		}
@@ -137,6 +147,7 @@ public final class LevelsPlayerManager {
 		applyPersistedPlayerData(PlayerDataAPIManager.getSystemDataForPlayer(player, DATA_FILE_NAME, "players", "uuid"));
 		state(player);
 		LevelsAttributesManager.applyPlayerAttributes(player);
+		LevelsFeatureAPIManager.handleMaximumHungerChanged(player);
 		LevelsFeatureAPIManager.restoreJoinHealth(player);
 		markDirty(player.getUUID());
 	}
@@ -150,10 +161,15 @@ public final class LevelsPlayerManager {
 		}
 		LevelsAttributesManager.applyPlayerAttributes(newPlayer);
 		markDirty(newPlayer.getUUID());
+		persistCurrentState(newPlayer);
 	}
 
 	private static void markDirty(UUID playerId) {
 		if (playerId != null) DIRTY_PLAYERS.add(playerId);
+	}
+
+	private static void persistCurrentState(ServerPlayer player) {
+		if (player != null) savePersistedData(player.level().getServer());
 	}
 
 	private static void applyPersistedData(JsonObject data) {
@@ -192,21 +208,25 @@ public final class LevelsPlayerManager {
 	private static JsonObject toPersistedData() {
 		JsonArray players = new JsonArray();
 		for (Map.Entry<UUID, LevelsPlayerState> entry : PLAYER_STATES.entrySet()) {
-			LevelsPlayerState state = entry.getValue();
-			JsonObject stats = new JsonObject();
-			for (LevelStat stat : LevelStat.values()) stats.addProperty(stat.id(), state.statLevel(stat));
-			JsonObject player = new JsonObject();
+			JsonObject player = toPersistedPlayerData(entry.getValue());
 			player.addProperty("uuid", entry.getKey().toString());
-			player.addProperty("level", state.level);
-			player.addProperty("current-xp", state.currentXp);
-			player.addProperty("required-xp", requiredXpForLevel(state.level));
-			player.addProperty("available-points", state.availablePoints);
-			player.add("stats", stats);
 			players.add(player);
 		}
 		JsonObject data = new JsonObject();
 		data.add("players", players);
 		return data;
+	}
+
+	private static JsonObject toPersistedPlayerData(LevelsPlayerState state) {
+		JsonObject stats = new JsonObject();
+		for (LevelStat stat : LevelStat.values()) stats.addProperty(stat.id(), state.statLevel(stat));
+		JsonObject player = new JsonObject();
+		player.addProperty("level", state.level);
+		player.addProperty("current-xp", state.currentXp);
+		player.addProperty("required-xp", requiredXpForLevel(state.level));
+		player.addProperty("available-points", state.availablePoints);
+		player.add("stats", stats);
+		return player;
 	}
 
 	private static JsonObject object(JsonObject source, String key) {
