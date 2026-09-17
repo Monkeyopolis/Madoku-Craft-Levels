@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
 
 public final class MadokuLevelsClient {
 	private static final KeyMapping.Category MADOKU_LEVELS_CATEGORY = KeyMapping.Category.register(
@@ -16,8 +15,7 @@ public final class MadokuLevelsClient {
 	);
 	private static final KeyMapping OPEN_LEVELS_KEY = new KeyMapping(
 		"key.madoku-craft.open_levels",
-		InputConstants.Type.KEYSYM,
-		GLFW.GLFW_KEY_K,
+		InputConstants.KEY_K,
 		MADOKU_LEVELS_CATEGORY
 	);
 	private static boolean initialized = false;
