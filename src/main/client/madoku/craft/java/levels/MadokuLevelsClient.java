@@ -1,6 +1,8 @@
 package madoku.craft.java.levels;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import madoku.craft.java.core.menu.LevelsMenuAPIManager;
+import madoku.craft.java.core.menu.LevelsMenuClientAPIManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -29,6 +31,7 @@ public final class MadokuLevelsClient {
 		}
 
 		KeyMappingHelper.registerKeyMapping(OPEN_LEVELS_KEY);
+		LevelsMenuAPIManager.registerProvider(new MadokuLevelsMenuProvider());
 		ClientPlayNetworking.registerGlobalReceiver(LevelsPayloadAPIManager.Payload.TYPE, (payload, context) ->
 			MadokuLevelsClientState.applyPayload(payload)
 		);
@@ -43,7 +46,7 @@ public final class MadokuLevelsClient {
 		}
 
 		if (OPEN_LEVELS_KEY.consumeClick() && client.gui.screen() == null) {
-			client.setScreenAndShow(new MadokuLevelsScreen());
+			LevelsMenuClientAPIManager.open();
 		}
 	}
 
