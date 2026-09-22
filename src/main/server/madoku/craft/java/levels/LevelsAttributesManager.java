@@ -26,7 +26,6 @@ public final class LevelsAttributesManager {
 		LevelsFeatureAPIManager.applyPlayerMaxHealthAbilityBonus(player);
 		apply(player.getAttribute(Attributes.ATTACK_DAMAGE), STRENGTH_MODIFIER, valueAtLevel(player, LevelStat.STRENGTH, state.statLevel(LevelStat.STRENGTH)));
 		LevelsFeatureAPIManager.applyPlayerDamageAbilityBonus(player);
-		LevelsFeatureAPIManager.applyPlayerArmorAbilityBonus(player);
 		apply(player.getAttribute(Attributes.LUCK), LUCK_MODIFIER, valueAtLevel(player, LevelStat.LUCK, state.statLevel(LevelStat.LUCK)));
 		apply(player.getAttribute(Attributes.MOVEMENT_SPEED), MOVEMENT_SPEED_MODIFIER, valueAtLevel(player, LevelStat.MOVEMENT_SPEED, state.statLevel(LevelStat.MOVEMENT_SPEED)));
 		if (player.getHealth() > player.getMaxHealth()) player.setHealth(player.getMaxHealth());
