@@ -42,10 +42,9 @@ public final class MadokuLevelsMenuProvider implements LevelsMenuProvider {
 
 	private Identifier rowTexture(LevelStat stat) {
 		String textureName = switch (stat) {
-			case ARMOR -> "defense";
 			case MOVEMENT_SPEED -> "speed";
 		default -> stat.id();
 		};
-		return Identifier.fromNamespaceAndPath("madoku-craft", "textures/player-levels/" + textureName + "-attribute.png");
+		return Identifier.fromNamespaceAndPath("madoku-craft", "textures/levels-menu/" + textureName + "-attribute.png");
 	}
 }

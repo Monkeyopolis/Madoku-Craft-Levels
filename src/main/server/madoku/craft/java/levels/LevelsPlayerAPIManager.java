@@ -33,6 +33,9 @@ public final class LevelsPlayerAPIManager {
 	public static void addXp(ServerPlayer player, int xpAmount) { provider.addXp(player, xpAmount); }
 	public static void upgradeStat(ServerPlayer player, String statId) { provider.upgradeStat(player, statId); }
 	public static int getPlayerHungerBonusPoints(ServerPlayer player) { return provider.getPlayerHungerBonusPoints(player); }
+	public static double getPlayerDefensePoints(ServerPlayer player) { return provider.getPlayerDefensePoints(player); }
+	public static int getPlayerOxygenBonusTicks(ServerPlayer player) { return provider.getPlayerOxygenBonusTicks(player); }
+	public static double getPlayerMiningSpeedBonus(ServerPlayer player) { return provider.getPlayerMiningSpeedBonus(player); }
 	public static void loadPersistedData(MinecraftServer server) { provider.loadPersistedData(server); }
 	public static void autosavePersistedData(MinecraftServer server) { provider.autosavePersistedData(server); }
 	public static void savePersistedData(MinecraftServer server) { provider.savePersistedData(server); }

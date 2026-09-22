@@ -10,7 +10,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 public final class LevelsAttributesManager {
 	private static final Identifier HEALTH_MODIFIER = id("levels_health");
 	private static final Identifier STRENGTH_MODIFIER = id("levels_strength");
-	private static final Identifier ARMOR_MODIFIER = id("levels_armor");
 	private static final Identifier LUCK_MODIFIER = id("levels_luck");
 	private static final Identifier MOVEMENT_SPEED_MODIFIER = id("levels_movement_speed");
 
@@ -27,7 +26,6 @@ public final class LevelsAttributesManager {
 		LevelsFeatureAPIManager.applyPlayerMaxHealthAbilityBonus(player);
 		apply(player.getAttribute(Attributes.ATTACK_DAMAGE), STRENGTH_MODIFIER, valueAtLevel(player, LevelStat.STRENGTH, state.statLevel(LevelStat.STRENGTH)));
 		LevelsFeatureAPIManager.applyPlayerDamageAbilityBonus(player);
-		apply(player.getAttribute(Attributes.ARMOR), ARMOR_MODIFIER, valueAtLevel(player, LevelStat.ARMOR, state.statLevel(LevelStat.ARMOR)));
 		LevelsFeatureAPIManager.applyPlayerArmorAbilityBonus(player);
 		apply(player.getAttribute(Attributes.LUCK), LUCK_MODIFIER, valueAtLevel(player, LevelStat.LUCK, state.statLevel(LevelStat.LUCK)));
 		apply(player.getAttribute(Attributes.MOVEMENT_SPEED), MOVEMENT_SPEED_MODIFIER, valueAtLevel(player, LevelStat.MOVEMENT_SPEED, state.statLevel(LevelStat.MOVEMENT_SPEED)));
@@ -37,6 +35,16 @@ public final class LevelsAttributesManager {
 	public static int hungerBonusPoints(ServerPlayer player, int level) {
 		if (player == null || !LevelsFeatureAPIManager.isHungerEnabled() || !MadokuLevelsManager.isEnabled()) return 0;
 		return Math.max(0, (int) Math.round(valueAtLevel(player, LevelStat.HUNGER, level)));
+	}
+
+	public static int oxygenBonusTicks(ServerPlayer player, int level) {
+		if (player == null || !LevelsFeatureAPIManager.isOxygenEnabled() || !MadokuLevelsManager.isEnabled()) return 0;
+		return Math.max(0, (int) Math.round(valueAtLevel(player, LevelStat.OXYGEN, level)));
+	}
+
+	public static double miningSpeedBonus(ServerPlayer player, int level) {
+		if (player == null || !MadokuLevelsManager.isEnabled()) return 0.0d;
+		return Math.max(0.0d, valueAtLevel(player, LevelStat.MINING, level));
 	}
 
 	public static double valueAtLevel(ServerPlayer player, LevelStat stat, int level) {
@@ -56,16 +64,17 @@ public final class LevelsAttributesManager {
 				case HUNGER -> 20.0d;
 				case MOVEMENT_SPEED -> 0.1d;
 				case STRENGTH -> 1.0d;
-				case ARMOR, LUCK -> 0.0d;
+				case DEFENSE, LUCK, OXYGEN, MINING -> 1.0d;
 			};
 		}
 		return switch (stat) {
 			case HEALTH -> baseAttribute(player, Attributes.MAX_HEALTH, 20.0d);
 			case STRENGTH -> baseAttribute(player, Attributes.ATTACK_DAMAGE, 1.0d);
-			case ARMOR -> baseAttribute(player, Attributes.ARMOR, 0.0d);
+			case DEFENSE -> 1.0d;
 			case LUCK -> baseAttribute(player, Attributes.LUCK, 0.0d);
 			case MOVEMENT_SPEED -> baseAttribute(player, Attributes.MOVEMENT_SPEED, 0.1d);
 			case HUNGER -> 20.0d;
+			case OXYGEN, MINING -> 1.0d;
 		};
 	}
 

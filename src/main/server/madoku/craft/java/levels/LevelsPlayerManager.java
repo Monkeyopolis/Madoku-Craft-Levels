@@ -69,11 +69,29 @@ public final class LevelsPlayerManager {
 		state.availablePoints--;
 		LevelsAttributesManager.applyPlayerAttributes(player);
 		LevelsFeatureAPIManager.handleMaximumHungerChanged(player);
+		if (stat == LevelStat.OXYGEN) LevelsFeatureAPIManager.handleMaximumOxygenChanged(player);
 		markDirty(player.getUUID());
 	}
 
 	public static int getPlayerHungerBonusPoints(ServerPlayer player) {
 		return player == null ? 0 : LevelsAttributesManager.hungerBonusPoints(player, state(player).statLevel(LevelStat.HUNGER));
+	}
+
+	public static double getPlayerDefensePoints(ServerPlayer player) {
+		if (player == null || !MadokuLevelsManager.isEnabled()) return 0.0d;
+		return LevelsAttributesManager.valueAtLevel(player, LevelStat.DEFENSE, state(player).statLevel(LevelStat.DEFENSE));
+	}
+
+	public static int getPlayerOxygenBonusTicks(ServerPlayer player) {
+		if (player == null || !MadokuLevelsManager.isEnabled()) return 0;
+		LevelsPlayerState playerState = state(player);
+		return LevelsAttributesManager.oxygenBonusTicks(player, playerState.statLevel(LevelStat.OXYGEN));
+	}
+
+	public static double getPlayerMiningSpeedBonus(ServerPlayer player) {
+		if (player == null || !MadokuLevelsManager.isEnabled()) return 0.0d;
+		LevelsPlayerState playerState = state(player);
+		return LevelsAttributesManager.miningSpeedBonus(player, playerState.statLevel(LevelStat.MINING));
 	}
 
 	public static void loadPersistedData(MinecraftServer server) {
@@ -138,6 +156,7 @@ public final class LevelsPlayerManager {
 		state(player);
 		LevelsAttributesManager.applyPlayerAttributes(player);
 		LevelsFeatureAPIManager.restoreJoinHealth(player);
+		LevelsFeatureAPIManager.handleMaximumOxygenChanged(player);
 		markDirty(player.getUUID());
 	}
 
@@ -149,6 +168,7 @@ public final class LevelsPlayerManager {
 			state.requiredXp = requiredXpForLevel(state.level);
 		}
 		LevelsAttributesManager.applyPlayerAttributes(newPlayer);
+		LevelsFeatureAPIManager.handleMaximumOxygenChanged(newPlayer);
 		markDirty(newPlayer.getUUID());
 	}
 
@@ -184,7 +204,13 @@ public final class LevelsPlayerManager {
 			state.requiredXp = requiredXpForLevel(state.level);
 			state.availablePoints = Math.max(0, readInt(playerData, "available-points", 1));
 			JsonObject stats = object(playerData, "stats");
-			for (LevelStat stat : LevelStat.values()) state.statLevels.put(stat, stat.clampLevel(readInt(stats, stat.id(), LevelStat.DEFAULT_LEVEL)));
+			for (LevelStat stat : LevelStat.values()) {
+				int savedLevel = readInt(stats, stat.id(), Integer.MIN_VALUE);
+				if (stat == LevelStat.DEFENSE && savedLevel == Integer.MIN_VALUE) {
+					savedLevel = readInt(stats, "armor", LevelStat.DEFAULT_LEVEL);
+				}
+				state.statLevels.put(stat, stat.clampLevel(savedLevel == Integer.MIN_VALUE ? LevelStat.DEFAULT_LEVEL : savedLevel));
+			}
 			PLAYER_STATES.put(playerId, state);
 		} catch (IllegalArgumentException ignored) { }
 	}

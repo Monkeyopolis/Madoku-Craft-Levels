@@ -18,9 +18,11 @@ public final class LevelsFeatureAPIManager {
 	public static boolean useAttributesContainer() { return adapter.useAttributesContainer(); }
 	public static boolean isHungerEnabled() { return adapter.isHungerEnabled(); }
 	public static boolean isLuckEnabled() { return adapter.isLuckEnabled(); }
+	public static boolean isOxygenEnabled() { return adapter.isOxygenEnabled(); }
 	public static void applyPlayerMaxHealthAbilityBonus(ServerPlayer player) { adapter.applyPlayerMaxHealthAbilityBonus(player); }
 	public static void applyPlayerDamageAbilityBonus(ServerPlayer player) { adapter.applyPlayerDamageAbilityBonus(player); }
 	public static void applyPlayerArmorAbilityBonus(ServerPlayer player) { adapter.applyPlayerArmorAbilityBonus(player); }
 	public static void handleMaximumHungerChanged(ServerPlayer player) { adapter.handleMaximumHungerChanged(player); }
+	public static void handleMaximumOxygenChanged(ServerPlayer player) { adapter.handleMaximumOxygenChanged(player); }
 	public static void restoreJoinHealth(ServerPlayer player) { adapter.restoreJoinHealth(player); }
 }

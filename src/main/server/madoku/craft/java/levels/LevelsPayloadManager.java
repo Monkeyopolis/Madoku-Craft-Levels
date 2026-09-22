@@ -30,7 +30,8 @@ public final class LevelsPayloadManager {
 			LevelStat.encodeVisibleStats(LevelStat.visibleStats(
 				MadokuLevelsManager.useAttributesContainer(),
 				LevelsFeatureAPIManager.isHungerEnabled(),
-				LevelsFeatureAPIManager.isLuckEnabled()
+				LevelsFeatureAPIManager.isLuckEnabled(),
+				LevelsFeatureAPIManager.isOxygenEnabled()
 			)),
 			LevelStat.encodeLevels(stateLevels(state))
 		);

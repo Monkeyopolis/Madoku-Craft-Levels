@@ -11,6 +11,9 @@ public interface LevelsPlayerProvider {
 	default void addXp(ServerPlayer player, int xpAmount) { }
 	default void upgradeStat(ServerPlayer player, String statId) { }
 	default int getPlayerHungerBonusPoints(ServerPlayer player) { return 0; }
+	default double getPlayerDefensePoints(ServerPlayer player) { return 0.0d; }
+	default int getPlayerOxygenBonusTicks(ServerPlayer player) { return 0; }
+	default double getPlayerMiningSpeedBonus(ServerPlayer player) { return 0.0d; }
 	default void loadPersistedData(MinecraftServer server) { }
 	default void autosavePersistedData(MinecraftServer server) { }
 	default void savePersistedData(MinecraftServer server) { }

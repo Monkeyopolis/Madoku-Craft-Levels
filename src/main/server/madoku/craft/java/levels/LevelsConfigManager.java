@@ -60,7 +60,9 @@ public final class LevelsConfigManager {
 		try {
 			Path directory = JSONAPIManager.getOrCreateGlobalSystemDirectory(CONFIG_FOLDER_NAME);
 			Path file = directory.resolve(CONFIG_FILE_NAME + ".json");
+			JsonObject source = JSONFormatAPIManager.readManagedDocument(file).data();
 			JsonObject normalized = JSONFormatAPIManager.ensureManagedFile(file, fallback.toJson());
+			migrateLegacyDefenseStat(source, normalized);
 			Settings loaded = Settings.fromJson(normalized);
 			JSONFormatAPIManager.writeManagedFile(file, loaded.toJson(), fallback.toJson());
 			settings = loaded;
@@ -68,6 +70,13 @@ public final class LevelsConfigManager {
 			settings = fallback;
 			LOGGER.warn("Using default Madoku Levels settings after configuration load failure.", exception);
 		}
+	}
+
+	private static void migrateLegacyDefenseStat(JsonObject source, JsonObject normalized) {
+		JsonObject sourceStats = object(source, "stats");
+		if (!sourceStats.has("armor") || sourceStats.has("defense")) return;
+		JsonObject normalizedStats = object(normalized, "stats");
+		normalizedStats.add("defense", sourceStats.get("armor").deepCopy());
 	}
 
 	public enum IncrementType {
@@ -110,7 +119,11 @@ public final class LevelsConfigManager {
 			EnumMap<LevelStat, StatSettings> stats = new EnumMap<>(LevelStat.class);
 			JsonObject statsObject = object(source, "stats");
 			for (LevelStat stat : LevelStat.values()) {
-				stats.put(stat, StatSettings.fromJson(object(statsObject, stat.id()), defaults.stats().get(stat)));
+				JsonObject statSource = object(statsObject, stat.id());
+				if (stat == LevelStat.DEFENSE && statSource.size() == 0) {
+					statSource = object(statsObject, "armor");
+				}
+				stats.put(stat, StatSettings.fromJson(statSource, defaults.stats().get(stat)));
 			}
 			return new Settings(
 				readBoolean(source, "enabled", defaults.enabled()),
@@ -141,7 +154,7 @@ public final class LevelsConfigManager {
 
 	public record PlayerSettings(int maxLevel, double baseXpRequirement, double baseXpMultiplier) {
 		private static PlayerSettings defaults() {
-			return new PlayerSettings(60, 5.0d, 0.05d);
+			return new PlayerSettings(80, 5.0d, 0.05d);
 		}
 	}
 

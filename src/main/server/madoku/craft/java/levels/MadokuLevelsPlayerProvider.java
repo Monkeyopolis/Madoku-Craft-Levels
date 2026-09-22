@@ -11,6 +11,9 @@ public final class MadokuLevelsPlayerProvider implements LevelsPlayerProvider {
 	@Override public void addXp(ServerPlayer player, int xpAmount) { LevelsPlayerManager.addXp(player, xpAmount); }
 	@Override public void upgradeStat(ServerPlayer player, String statId) { LevelsPlayerManager.upgradeStat(player, statId); }
 	@Override public int getPlayerHungerBonusPoints(ServerPlayer player) { return LevelsPlayerManager.getPlayerHungerBonusPoints(player); }
+	@Override public double getPlayerDefensePoints(ServerPlayer player) { return LevelsPlayerManager.getPlayerDefensePoints(player); }
+	@Override public int getPlayerOxygenBonusTicks(ServerPlayer player) { return LevelsPlayerManager.getPlayerOxygenBonusTicks(player); }
+	@Override public double getPlayerMiningSpeedBonus(ServerPlayer player) { return LevelsPlayerManager.getPlayerMiningSpeedBonus(player); }
 	@Override public void loadPersistedData(MinecraftServer server) { LevelsPlayerManager.loadPersistedData(server); }
 	@Override public void autosavePersistedData(MinecraftServer server) { LevelsPlayerManager.autosavePersistedData(server); }
 	@Override public void savePersistedData(MinecraftServer server) { LevelsPlayerManager.savePersistedData(server); }

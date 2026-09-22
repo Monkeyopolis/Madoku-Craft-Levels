@@ -13,9 +13,11 @@ public enum LevelStat {
 	HEALTH("health", "Health", "health", 0xFF6B6B, 1.0d),
 	HUNGER("hunger", "Hunger", "hunger", 0xF9C74F, 2.0d),
 	STRENGTH("strength", "Strength", "strength", 0xF4A261, 0.2d),
-	ARMOR("armor", "Armor", "defense", 0x4D96FF, 0.4d),
+	DEFENSE("defense", "Defense", "defense", 0x4D96FF, 1.0d),
 	LUCK("luck", "Luck", "luck", 0x6A994E, 2.0d),
-	MOVEMENT_SPEED("movement-speed", "Speed", "speed", 0x43AA8B, 0.001d);
+	MOVEMENT_SPEED("movement-speed", "Speed", "speed", 0x43AA8B, 0.001d),
+	OXYGEN("oxygen", "Oxygen", "oxygen", 0x4CC9F0, 30.0d),
+	MINING("mining", "Mining", "mining", 0xB08968, 0.2d);
 
 	public static final int DEFAULT_LEVEL = 0;
 
@@ -55,6 +57,7 @@ public enum LevelStat {
 	public static LevelStat fromId(String id) {
 		if (id == null || id.isBlank()) return null;
 		for (LevelStat stat : values()) if (stat.id.equalsIgnoreCase(id.trim())) return stat;
+		if ("armor".equalsIgnoreCase(id.trim())) return DEFENSE;
 		return null;
 	}
 
@@ -64,17 +67,22 @@ public enum LevelStat {
 		return levels;
 	}
 
-	public static List<LevelStat> vanillaVisibleStats() { return List.of(HEALTH, STRENGTH, ARMOR, MOVEMENT_SPEED); }
+	public static List<LevelStat> vanillaVisibleStats() { return List.of(HEALTH, STRENGTH, DEFENSE, MOVEMENT_SPEED, MINING); }
 
 	public static List<LevelStat> attributeVisibleStats() {
-		return List.of(HEALTH, HUNGER, STRENGTH, ARMOR, LUCK, MOVEMENT_SPEED);
+		return List.of(HEALTH, HUNGER, STRENGTH, DEFENSE, LUCK, MOVEMENT_SPEED, OXYGEN, MINING);
 	}
 
 	public static List<LevelStat> visibleStats(boolean useAttributesContainer, boolean hungerEnabled, boolean luckEnabled) {
+		return visibleStats(useAttributesContainer, hungerEnabled, luckEnabled, true);
+	}
+
+	public static List<LevelStat> visibleStats(boolean useAttributesContainer, boolean hungerEnabled, boolean luckEnabled, boolean oxygenEnabled) {
 		if (!useAttributesContainer) return vanillaVisibleStats();
 		List<LevelStat> visible = new ArrayList<>(attributeVisibleStats());
 		if (!hungerEnabled) visible.remove(HUNGER);
 		if (!luckEnabled) visible.remove(LUCK);
+		if (!oxygenEnabled) visible.remove(OXYGEN);
 		return List.copyOf(visible);
 	}
 
