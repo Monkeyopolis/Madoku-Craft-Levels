@@ -1,25 +1,10 @@
 package madoku.craft.java.levels;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import madoku.craft.java.core.menu.LevelsMenuAPIManager;
-import madoku.craft.java.core.menu.LevelsMenuClientAPIManager;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.Identifier;
 
 public final class MadokuLevelsClient {
-	private static final KeyMapping.Category MADOKU_LEVELS_CATEGORY = KeyMapping.Category.register(
-		Identifier.fromNamespaceAndPath("madoku-craft", "madokulevels")
-	);
-	private static final KeyMapping OPEN_LEVELS_KEY = new KeyMapping(
-		"key.madoku-craft.open_levels",
-		InputConstants.KEY_K,
-		MADOKU_LEVELS_CATEGORY
-	);
 	private static boolean initialized = false;
 
 	private MadokuLevelsClient() {
@@ -30,24 +15,12 @@ public final class MadokuLevelsClient {
 			return;
 		}
 
-		KeyMappingHelper.registerKeyMapping(OPEN_LEVELS_KEY);
 		LevelsMenuAPIManager.registerProvider(new MadokuLevelsMenuProvider());
 		ClientPlayNetworking.registerGlobalReceiver(LevelsPayloadAPIManager.Payload.TYPE, (payload, context) ->
 			MadokuLevelsClientState.applyPayload(payload)
 		);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> MadokuLevelsClientState.clear());
-		ClientTickEvents.END_CLIENT_TICK.register(MadokuLevelsClient::handleClientTick);
 		initialized = true;
-	}
-
-	private static void handleClientTick(Minecraft client) {
-		if (client == null || client.player == null) {
-			return;
-		}
-
-		if (OPEN_LEVELS_KEY.consumeClick() && client.gui.screen() == null) {
-			LevelsMenuClientAPIManager.open();
-		}
 	}
 
 	public static void requestStatUpgrade(LevelStat stat) {
