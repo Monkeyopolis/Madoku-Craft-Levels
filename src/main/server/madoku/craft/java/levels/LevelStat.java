@@ -40,7 +40,7 @@ public enum LevelStat {
 	public int accentColor() { return accentColor; }
 	public double defaultIncrement() { return defaultIncrement; }
 	public Identifier iconTexture() {
-		return Identifier.fromNamespaceAndPath("madoku-craft", "textures/icons/" + iconTextureName + ".png");
+		return Identifier.fromNamespaceAndPath("madoku-craft", "textures/madoku-menu/levels-menu/" + iconTextureName + "-attribute.png");
 	}
 
 	public int maxLevel() { return LevelsConfigAPIManager.stat(this).maxLevel(); }

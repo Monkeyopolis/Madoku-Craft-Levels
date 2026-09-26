@@ -45,6 +45,6 @@ public final class MadokuLevelsMenuProvider implements LevelsMenuProvider {
 			case MOVEMENT_SPEED -> "speed";
 		default -> stat.id();
 		};
-		return Identifier.fromNamespaceAndPath("madoku-craft", "textures/levels-menu/" + textureName + "-attribute.png");
+		return Identifier.fromNamespaceAndPath("madoku-craft", "textures/madoku-menu/levels-menu/" + textureName + "-attribute.png");
 	}
 }
