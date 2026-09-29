@@ -14,7 +14,7 @@ You can customize this feature in the config files.
 
 - You can level up by gaining experience points.
 - To allocate points to upgrade an attribute, open up the dedicated menu.
-- By default, the keybind is set to K.
+- By default, the keybind to open up the main menu is Tab.
 - This keybind is customizable in the in-game settings.
 
 **Points:**
