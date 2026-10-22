@@ -11,6 +11,7 @@ public interface LevelsFeatureAdapter {
 	default void applyPlayerMaxHealthAbilityBonus(ServerPlayer player) { }
 	default void applyPlayerDamageAbilityBonus(ServerPlayer player) { }
 	default void handleMaximumHungerChanged(ServerPlayer player) { }
+	default void restoreJoinHunger(ServerPlayer player) { }
 	default void handleMaximumOxygenChanged(ServerPlayer player) { }
 	default void restoreJoinHealth(ServerPlayer player) { }
 }

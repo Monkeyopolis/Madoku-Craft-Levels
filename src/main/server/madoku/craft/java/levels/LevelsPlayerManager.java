@@ -105,6 +105,7 @@ public final class LevelsPlayerManager {
 			state(player);
 			LevelsAttributesManager.applyPlayerAttributes(player);
 			LevelsFeatureAPIManager.restoreJoinHealth(player);
+			LevelsFeatureAPIManager.restoreJoinHunger(player);
 			markDirty(player.getUUID());
 		}
 	}
@@ -156,6 +157,7 @@ public final class LevelsPlayerManager {
 		state(player);
 		LevelsAttributesManager.applyPlayerAttributes(player);
 		LevelsFeatureAPIManager.restoreJoinHealth(player);
+		LevelsFeatureAPIManager.restoreJoinHunger(player);
 		LevelsFeatureAPIManager.handleMaximumOxygenChanged(player);
 		markDirty(player.getUUID());
 	}
@@ -168,6 +170,7 @@ public final class LevelsPlayerManager {
 			state.requiredXp = requiredXpForLevel(state.level);
 		}
 		LevelsAttributesManager.applyPlayerAttributes(newPlayer);
+		LevelsFeatureAPIManager.handleMaximumHungerChanged(newPlayer);
 		LevelsFeatureAPIManager.handleMaximumOxygenChanged(newPlayer);
 		markDirty(newPlayer.getUUID());
 	}

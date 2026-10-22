@@ -22,6 +22,7 @@ public final class LevelsFeatureAPIManager {
 	public static void applyPlayerMaxHealthAbilityBonus(ServerPlayer player) { adapter.applyPlayerMaxHealthAbilityBonus(player); }
 	public static void applyPlayerDamageAbilityBonus(ServerPlayer player) { adapter.applyPlayerDamageAbilityBonus(player); }
 	public static void handleMaximumHungerChanged(ServerPlayer player) { adapter.handleMaximumHungerChanged(player); }
+	public static void restoreJoinHunger(ServerPlayer player) { adapter.restoreJoinHunger(player); }
 	public static void handleMaximumOxygenChanged(ServerPlayer player) { adapter.handleMaximumOxygenChanged(player); }
 	public static void restoreJoinHealth(ServerPlayer player) { adapter.restoreJoinHealth(player); }
 }
