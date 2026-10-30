@@ -4,6 +4,7 @@ import madoku.craft.java.core.menu.MenuAPIManager;
 import madoku.craft.java.core.menu.MenuEntry;
 import madoku.craft.java.core.menu.LevelsMenuAPIManager;
 import madoku.craft.java.core.menu.LevelsMenuClientAPIManager;
+import madoku.craft.java.core.attribute.PlayerAttributeAPIManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.resources.Identifier;
@@ -20,6 +21,7 @@ public final class MadokuLevelsClient {
 		}
 
 		LevelsMenuAPIManager.registerProvider(new MadokuLevelsMenuProvider());
+		PlayerAttributeAPIManager.registerProvider(new MadokuLevelsClientMiningSpeedProvider());
 		MenuAPIManager.registerEntry(new MenuEntry(
 			"levels",
 			"menu.madoku-craft.levels",

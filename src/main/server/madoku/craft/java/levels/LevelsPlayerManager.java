@@ -73,27 +73,6 @@ public final class LevelsPlayerManager {
 		markDirty(player.getUUID());
 	}
 
-	public static int getPlayerHungerBonusPoints(ServerPlayer player) {
-		return player == null ? 0 : LevelsAttributesManager.hungerBonusPoints(player, state(player).statLevel(LevelStat.HUNGER));
-	}
-
-	public static double getPlayerDefensePoints(ServerPlayer player) {
-		if (player == null || !MadokuLevelsManager.isEnabled()) return 0.0d;
-		return LevelsAttributesManager.valueAtLevel(player, LevelStat.DEFENSE, state(player).statLevel(LevelStat.DEFENSE));
-	}
-
-	public static int getPlayerOxygenBonusTicks(ServerPlayer player) {
-		if (player == null || !MadokuLevelsManager.isEnabled()) return 0;
-		LevelsPlayerState playerState = state(player);
-		return LevelsAttributesManager.oxygenBonusTicks(player, playerState.statLevel(LevelStat.OXYGEN));
-	}
-
-	public static double getPlayerMiningSpeedBonus(ServerPlayer player) {
-		if (player == null || !MadokuLevelsManager.isEnabled()) return 0.0d;
-		LevelsPlayerState playerState = state(player);
-		return LevelsAttributesManager.miningSpeedBonus(player, playerState.statLevel(LevelStat.MINING));
-	}
-
 	public static void loadPersistedData(MinecraftServer server) {
 		if (server == null) return;
 		LevelsConfigManager.reload();

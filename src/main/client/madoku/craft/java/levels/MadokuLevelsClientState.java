@@ -38,6 +38,10 @@ public final class MadokuLevelsClientState {
 		return version;
 	}
 
+	public static int miningLevel() {
+		return snapshot.statLevel(LevelStat.MINING);
+	}
+
 	public static void clear() {
 		snapshot = Snapshot.empty();
 		version++;

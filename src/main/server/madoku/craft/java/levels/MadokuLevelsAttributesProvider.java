@@ -7,6 +7,5 @@ public final class MadokuLevelsAttributesProvider implements LevelsAttributesPro
 	@Override public void initialize() { LevelsAttributesManager.initialize(); }
 	@Override public void reset() { LevelsAttributesManager.reset(); }
 	@Override public void applyPlayerAttributes(ServerPlayer player) { LevelsAttributesManager.applyPlayerAttributes(player); }
-	@Override public int hungerBonusPoints(ServerPlayer player, int level) { return LevelsAttributesManager.hungerBonusPoints(player, level); }
 	@Override public double valueAtLevel(ServerPlayer player, LevelStat stat, int level) { return LevelsAttributesManager.valueAtLevel(player, stat, level); }
 }

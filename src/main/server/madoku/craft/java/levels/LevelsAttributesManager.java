@@ -1,18 +1,12 @@
 package madoku.craft.java.levels;
 
-import net.minecraft.resources.Identifier;
+import madoku.craft.java.core.attribute.PlayerAttributeAPIManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
 /** Applies configured level-stat increments to a player's runtime attributes. */
 public final class LevelsAttributesManager {
-	private static final Identifier HEALTH_MODIFIER = id("levels_health");
-	private static final Identifier STRENGTH_MODIFIER = id("levels_strength");
-	private static final Identifier LUCK_MODIFIER = id("levels_luck");
-	private static final Identifier MOVEMENT_SPEED_MODIFIER = id("levels_movement_speed");
-
 	private LevelsAttributesManager() { }
 
 	public static void initialize() { }
@@ -21,29 +15,8 @@ public final class LevelsAttributesManager {
 
 	public static void applyPlayerAttributes(ServerPlayer player) {
 		if (player == null) return;
-		LevelsPlayerState state = LevelsPlayerManager.state(player);
-		apply(player.getAttribute(Attributes.MAX_HEALTH), HEALTH_MODIFIER, valueAtLevel(player, LevelStat.HEALTH, state.statLevel(LevelStat.HEALTH)));
-		LevelsFeatureAPIManager.applyPlayerMaxHealthAbilityBonus(player);
-		apply(player.getAttribute(Attributes.ATTACK_DAMAGE), STRENGTH_MODIFIER, valueAtLevel(player, LevelStat.STRENGTH, state.statLevel(LevelStat.STRENGTH)));
-		LevelsFeatureAPIManager.applyPlayerDamageAbilityBonus(player);
-		apply(player.getAttribute(Attributes.LUCK), LUCK_MODIFIER, valueAtLevel(player, LevelStat.LUCK, state.statLevel(LevelStat.LUCK)));
-		apply(player.getAttribute(Attributes.MOVEMENT_SPEED), MOVEMENT_SPEED_MODIFIER, valueAtLevel(player, LevelStat.MOVEMENT_SPEED, state.statLevel(LevelStat.MOVEMENT_SPEED)));
+		PlayerAttributeAPIManager.apply(player);
 		if (player.getHealth() > player.getMaxHealth()) player.setHealth(player.getMaxHealth());
-	}
-
-	public static int hungerBonusPoints(ServerPlayer player, int level) {
-		if (player == null || !LevelsFeatureAPIManager.isHungerEnabled() || !MadokuLevelsManager.isEnabled()) return 0;
-		return Math.max(0, (int) Math.round(valueAtLevel(player, LevelStat.HUNGER, level)));
-	}
-
-	public static int oxygenBonusTicks(ServerPlayer player, int level) {
-		if (player == null || !LevelsFeatureAPIManager.isOxygenEnabled() || !MadokuLevelsManager.isEnabled()) return 0;
-		return Math.max(0, (int) Math.round(valueAtLevel(player, LevelStat.OXYGEN, level)));
-	}
-
-	public static double miningSpeedBonus(ServerPlayer player, int level) {
-		if (player == null || !MadokuLevelsManager.isEnabled()) return 0.0d;
-		return Math.max(0.0d, valueAtLevel(player, LevelStat.MINING, level));
 	}
 
 	public static double valueAtLevel(ServerPlayer player, LevelStat stat, int level) {
@@ -82,13 +55,4 @@ public final class LevelsAttributesManager {
 		return instance == null ? fallback : instance.getBaseValue();
 	}
 
-	private static void apply(AttributeInstance attribute, Identifier id, double amount) {
-		if (attribute == null) return;
-		attribute.removeModifier(id);
-		if (amount > 0.0d) attribute.addOrUpdateTransientModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_VALUE));
-	}
-
-	private static Identifier id(String path) {
-		return Identifier.fromNamespaceAndPath("madoku-craft", path);
-	}
 }

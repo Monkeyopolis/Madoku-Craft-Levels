@@ -4,8 +4,7 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "levels.LivingEntityDefenseMadokuLevelsMixin",
-    "levels.PlayerExperienceMadokuLevelsMixin",
-    "levels.PlayerMiningSpeedMadokuLevelsMixin"
+    "levels.PlayerExperienceMadokuLevelsMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }

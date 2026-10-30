@@ -1,6 +1,7 @@
 package madoku.craft.mixin.levels;
 
-import madoku.craft.java.levels.LevelsPlayerAPIManager;
+import madoku.craft.java.core.attribute.PlayerAttributeAPIManager;
+import madoku.craft.java.core.attribute.PlayerAttributeStat;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,7 +24,7 @@ public abstract class LivingEntityDefenseMadokuLevelsMixin {
 	) {
 		if (isHandledByAttributesCompat() || !((Object) this instanceof ServerPlayer player)) return;
 
-		double defensePoints = LevelsPlayerAPIManager.getPlayerDefensePoints(player);
+		double defensePoints = PlayerAttributeAPIManager.resolveBonus(player, PlayerAttributeStat.DEFENSE);
 		float damageAfterArmor = callbackInfo.getReturnValue();
 		if (defensePoints <= 0.0D || damageAfterArmor <= 0.0F) return;
 

@@ -15,7 +15,6 @@ public final class LevelsAttributesAPIManager {
 	public static void initialize() { provider.initialize(); }
 	public static void reset() { provider.reset(); }
 	public static void applyPlayerAttributes(ServerPlayer player) { provider.applyPlayerAttributes(player); }
-	public static int hungerBonusPoints(ServerPlayer player, int level) { return provider.hungerBonusPoints(player, level); }
 	public static double valueAtLevel(ServerPlayer player, LevelStat stat, int level) {
 		return provider.valueAtLevel(player, stat, level);
 	}

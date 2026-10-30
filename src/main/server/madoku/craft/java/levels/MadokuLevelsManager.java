@@ -1,5 +1,6 @@
 package madoku.craft.java.levels;
 
+import madoku.craft.java.core.attribute.PlayerAttributeAPIManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -15,6 +16,8 @@ public final class MadokuLevelsManager {
 		LevelsAttributesAPIManager.registerProvider(new MadokuLevelsAttributesProvider());
 		LevelsPlayerAPIManager.registerProvider(new MadokuLevelsPlayerProvider());
 		LevelsPayloadAPIManager.registerProvider(new MadokuLevelsPayloadProvider());
+		PlayerAttributeAPIManager.registerProvider(new MadokuLevelsPlayerAttributeProvider());
+		PlayerAttributeAPIManager.registerProvider(new MadokuLevelsMiningSpeedProvider());
 		LevelsConfigAPIManager.initialize();
 		LevelsAttributesAPIManager.initialize();
 		LevelsPlayerAPIManager.initialize();
@@ -38,7 +41,6 @@ public final class MadokuLevelsManager {
 	public static void savePersistedData(MinecraftServer server) { LevelsPlayerAPIManager.savePersistedData(server); }
 	public static void flushDirtySyncs(MinecraftServer server) { LevelsPlayerAPIManager.flushDirtySyncs(server); }
 	public static void addXp(ServerPlayer player, int xpAmount) { LevelsPlayerAPIManager.addXp(player, xpAmount); }
-	public static int getPlayerHungerBonusPoints(ServerPlayer player) { return LevelsPlayerAPIManager.getPlayerHungerBonusPoints(player); }
 
 	static void handleLevelUpRequest(ServerPlayer player, String statId) {
 		LevelsPlayerAPIManager.upgradeStat(player, statId);
