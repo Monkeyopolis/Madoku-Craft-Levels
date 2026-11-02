@@ -2,11 +2,13 @@ package madoku.craft.java.levels;
 
 import madoku.craft.java.core.module.MadokuStandaloneModule;
 import madoku.craft.java.core.module.MadokuStandaloneRuntime;
+import madoku.craft.java.core.module.MadokuModuleIds;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.server.MinecraftServer;
 
 /** Fabric entrypoint for the standalone Levels jar. */
 public final class MadokuLevelsInitializer implements ModInitializer, MadokuStandaloneModule {
+	@Override public net.minecraft.resources.Identifier id() { return MadokuModuleIds.LEVELS; }
 	@Override public void onInitialize() { MadokuStandaloneRuntime.initialize(this); }
 	@Override public void initialize() { MadokuLevelsManager.initialize(); }
 	@Override public void reset() { MadokuLevelsManager.reset(); }
