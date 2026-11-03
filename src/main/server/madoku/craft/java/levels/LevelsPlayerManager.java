@@ -58,6 +58,34 @@ public final class LevelsPlayerManager {
 		markDirty(player.getUUID());
 	}
 
+	/** Awards quest XP without allowing one quest to cross more than one level boundary. */
+	public static void addQuestXp(ServerPlayer player, int xpAmount) {
+		if (player == null || xpAmount <= 0 || !MadokuLevelsManager.isEnabled()) return;
+		LevelsPlayerState state = state(player);
+		int maximum = maxPlayerLevel();
+		long availableXp = addXpAmounts(state.surplusXp, state.currentXp);
+		availableXp = addXpAmounts(availableXp, xpAmount);
+		if (state.level >= maximum) {
+			state.currentXp = 0;
+			state.surplusXp = availableXp;
+			markDirty(player.getUUID());
+			return;
+		}
+
+		if (availableXp >= state.requiredXp) {
+			state.surplusXp = availableXp - state.requiredXp;
+			state.currentXp = 0;
+			state.level++;
+			state.availablePoints++;
+			state.requiredXp = requiredXpForLevel(state.level);
+		} else {
+			state.currentXp = (int) availableXp;
+			state.surplusXp = 0L;
+		}
+		LevelsAttributesManager.applyPlayerAttributes(player);
+		markDirty(player.getUUID());
+	}
+
 	public static void upgradeStat(ServerPlayer player, String statId) {
 		if (player == null || !MadokuLevelsManager.isEnabled()) return;
 		LevelStat stat = LevelStat.fromId(statId);
@@ -184,6 +212,7 @@ public final class LevelsPlayerManager {
 			state.level = Math.min(maxPlayerLevel(), Math.max(1, readInt(playerData, "level", 1)));
 			state.currentXp = Math.max(0, readInt(playerData, "current-xp", 0));
 			state.requiredXp = requiredXpForLevel(state.level);
+			state.surplusXp = Math.max(0L, readLong(playerData, "surplus-xp", 0L));
 			state.availablePoints = Math.max(0, readInt(playerData, "available-points", 1));
 			JsonObject stats = object(playerData, "stats");
 			for (LevelStat stat : LevelStat.values()) {
@@ -208,6 +237,7 @@ public final class LevelsPlayerManager {
 			player.addProperty("level", state.level);
 			player.addProperty("current-xp", state.currentXp);
 			player.addProperty("required-xp", requiredXpForLevel(state.level));
+			player.addProperty("surplus-xp", state.surplusXp);
 			player.addProperty("available-points", state.availablePoints);
 			player.add("stats", stats);
 			players.add(player);
@@ -225,6 +255,18 @@ public final class LevelsPlayerManager {
 	private static int readInt(JsonObject source, String key, int fallback) {
 		try { return source != null && source.has(key) ? source.get(key).getAsInt() : fallback; }
 		catch (RuntimeException exception) { return fallback; }
+	}
+
+	private static long readLong(JsonObject source, String key, long fallback) {
+		try { return source != null && source.has(key) ? source.get(key).getAsLong() : fallback; }
+		catch (RuntimeException exception) { return fallback; }
+	}
+
+	private static long addXpAmounts(long first, long second) {
+		if (first <= 0L) return Math.max(0L, second);
+		if (second <= 0L) return first;
+		if (first >= Long.MAX_VALUE - second) return Long.MAX_VALUE;
+		return first + second;
 	}
 
 	private static String readString(JsonObject source, String key, String fallback) {

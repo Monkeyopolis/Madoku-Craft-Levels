@@ -9,6 +9,7 @@ public interface LevelsPlayerProvider {
 	default void reset() { }
 	default LevelsPlayerState state(ServerPlayer player) { return null; }
 	default void addXp(ServerPlayer player, int xpAmount) { }
+	default void addQuestXp(ServerPlayer player, int xpAmount) { }
 	default void upgradeStat(ServerPlayer player, String statId) { }
 	default void loadPersistedData(MinecraftServer server) { }
 	default void autosavePersistedData(MinecraftServer server) { }

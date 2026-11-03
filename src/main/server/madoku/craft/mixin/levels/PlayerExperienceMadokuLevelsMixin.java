@@ -1,5 +1,7 @@
 package madoku.craft.mixin.levels;
 
+import madoku.craft.java.core.module.MadokuModuleIds;
+import madoku.craft.java.core.module.MadokuModuleLifecycleManager;
 import madoku.craft.java.levels.LevelsPlayerAPIManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -12,7 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerExperienceMadokuLevelsMixin {
 	@Inject(method = "giveExperiencePoints", at = @At("HEAD"))
 	private void madokuCraft$gainMadokuLevelsXp(int experience, CallbackInfo callbackInfo) {
-		if (experience <= 0 || !((Object) this instanceof ServerPlayer serverPlayer)) {
+		if (experience <= 0
+			|| MadokuModuleLifecycleManager.server().isRunning(MadokuModuleIds.QUESTS)
+			|| !((Object) this instanceof ServerPlayer serverPlayer)) {
 			return;
 		}
 

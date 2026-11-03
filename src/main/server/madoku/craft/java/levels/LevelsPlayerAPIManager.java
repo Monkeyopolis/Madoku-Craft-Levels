@@ -31,6 +31,7 @@ public final class LevelsPlayerAPIManager {
 	public static void reset() { provider.reset(); }
 	public static LevelsPlayerState state(ServerPlayer player) { return provider.state(player); }
 	public static void addXp(ServerPlayer player, int xpAmount) { provider.addXp(player, xpAmount); }
+	public static void addQuestXp(ServerPlayer player, int xpAmount) { provider.addQuestXp(player, xpAmount); }
 	public static void upgradeStat(ServerPlayer player, String statId) { provider.upgradeStat(player, statId); }
 	public static void loadPersistedData(MinecraftServer server) { provider.loadPersistedData(server); }
 	public static void autosavePersistedData(MinecraftServer server) { provider.autosavePersistedData(server); }

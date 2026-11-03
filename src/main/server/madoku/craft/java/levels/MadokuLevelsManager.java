@@ -1,6 +1,7 @@
 package madoku.craft.java.levels;
 
 import madoku.craft.java.core.attribute.PlayerAttributeAPIManager;
+import madoku.craft.java.core.quest.QuestRewardAPIManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -18,6 +19,7 @@ public final class MadokuLevelsManager {
 		LevelsPayloadAPIManager.registerProvider(new MadokuLevelsPayloadProvider());
 		PlayerAttributeAPIManager.registerProvider(new MadokuLevelsPlayerAttributeProvider());
 		PlayerAttributeAPIManager.registerProvider(new MadokuLevelsMiningSpeedProvider());
+		QuestRewardAPIManager.registerProvider(LevelsPlayerManager::addQuestXp);
 		LevelsConfigAPIManager.initialize();
 		LevelsAttributesAPIManager.initialize();
 		LevelsPlayerAPIManager.initialize();

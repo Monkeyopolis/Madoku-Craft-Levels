@@ -9,6 +9,7 @@ public final class MadokuLevelsPlayerProvider implements LevelsPlayerProvider {
 	@Override public void reset() { LevelsPlayerManager.reset(); }
 	@Override public LevelsPlayerState state(ServerPlayer player) { return LevelsPlayerManager.state(player); }
 	@Override public void addXp(ServerPlayer player, int xpAmount) { LevelsPlayerManager.addXp(player, xpAmount); }
+	@Override public void addQuestXp(ServerPlayer player, int xpAmount) { LevelsPlayerManager.addQuestXp(player, xpAmount); }
 	@Override public void upgradeStat(ServerPlayer player, String statId) { LevelsPlayerManager.upgradeStat(player, statId); }
 	@Override public void loadPersistedData(MinecraftServer server) { LevelsPlayerManager.loadPersistedData(server); }
 	@Override public void autosavePersistedData(MinecraftServer server) { LevelsPlayerManager.autosavePersistedData(server); }

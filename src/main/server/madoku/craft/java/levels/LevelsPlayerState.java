@@ -7,24 +7,27 @@ public final class LevelsPlayerState {
 	int level;
 	int currentXp;
 	int requiredXp;
+	long surplusXp;
 	int availablePoints;
 	final EnumMap<LevelStat, Integer> statLevels;
 
-	LevelsPlayerState(int level, int currentXp, int requiredXp, int availablePoints, EnumMap<LevelStat, Integer> statLevels) {
+	LevelsPlayerState(int level, int currentXp, int requiredXp, long surplusXp, int availablePoints, EnumMap<LevelStat, Integer> statLevels) {
 		this.level = level;
 		this.currentXp = currentXp;
 		this.requiredXp = requiredXp;
+		this.surplusXp = surplusXp;
 		this.availablePoints = availablePoints;
 		this.statLevels = statLevels;
 	}
 
 	static LevelsPlayerState defaults(int requiredXp) {
-		return new LevelsPlayerState(1, 0, requiredXp, 1, LevelStat.createDefaultLevels());
+		return new LevelsPlayerState(1, 0, requiredXp, 0L, 1, LevelStat.createDefaultLevels());
 	}
 
 	public int level() { return level; }
 	public int currentXp() { return currentXp; }
 	public int requiredXp() { return requiredXp; }
+	public long surplusXp() { return surplusXp; }
 	public int availablePoints() { return availablePoints; }
 	public int statLevel(LevelStat stat) { return statLevels.getOrDefault(stat, LevelStat.DEFAULT_LEVEL); }
 }
