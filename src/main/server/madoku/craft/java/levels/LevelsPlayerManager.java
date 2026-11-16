@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import madoku.craft.java.core.data.PlayerDataAPIManager;
+import madoku.craft.java.core.module.MadokuModuleIds;
+import madoku.craft.java.core.module.MadokuModuleLifecycleManager;
 import madoku.craft.java.core.sync.SyncPlayerAPIManager;
 import madoku.craft.java.core.time.TimeAPIManager;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -172,7 +174,7 @@ public final class LevelsPlayerManager {
 	private static void handlePlayerRespawn(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
 		if (newPlayer == null) return;
 		LevelsPlayerState state = state(newPlayer);
-		if (!alive) {
+		if (!alive && !MadokuModuleLifecycleManager.server().isRunning(MadokuModuleIds.QUESTS)) {
 			state.currentXp = 0;
 			state.requiredXp = requiredXpForLevel(state.level);
 		}
